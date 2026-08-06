@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { SUBJECT_COLORS } from "@/lib/config";
 
 type Lesson = { slug: string; title: string; order: number };
 type Chapter = { chapter: string; lessons: Lesson[] };
@@ -50,6 +51,34 @@ export default function CourseIndexClient({
     0
   );
   const [hidePassed, setHidePassed] = useState(false);
+  const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+
+  // 科目折叠状态记忆
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem("collapsed_subjects") ?? "[]");
+      if (Array.isArray(saved)) setCollapsed(new Set(saved));
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("collapsed_subjects", JSON.stringify(Array.from(collapsed)));
+    } catch {
+      /* ignore */
+    }
+  }, [collapsed]);
+
+  function toggleSubject(name: string) {
+    setCollapsed((s) => {
+      const next = new Set(s);
+      if (next.has(name)) next.delete(name);
+      else next.add(name);
+      return next;
+    });
+  }
   const flaggedCount = Object.entries(levels).filter(
     ([, lv]) => lv.isBoss === undefined && lv.passed === false && lv.hasQuiz === false
   ).length; // 占位（难点清单在服务端渲染）
@@ -108,7 +137,22 @@ export default function CourseIndexClient({
             <h2 className="text-lg font-bold">{s.name}</h2>
           </div>
           <div className="space-y-4 rounded-b-2xl border border-t-0 border-slate-200 bg-white p-4">
-            {s.chapters.map((c) => {
+            {s.chapters.length > 0 && (
+              <button
+                onClick={() => toggleSubject(s.name)}
+                className="flex w-full items-center justify-between rounded-lg bg-slate-50 px-3 py-2 text-left hover:bg-slate-100"
+              >
+                <span
+                  className="font-semibold"
+                  style={{ color: SUBJECT_COLORS[s.name]?.badge ?? "#334155" }}
+                >
+                  {s.name}
+                </span>
+                <span className="text-xs text-slate-400">{collapsed.has(s.name) ? "▸ 展开" : "▾ 收起"}</span>
+              </button>
+            )}
+            {!collapsed.has(s.name) &&
+              s.chapters.map((c) => {
               const boss = bosses[c.chapter];
               const chQuiz = c.lessons.filter((l) => levels[l.slug]?.hasQuiz);
               const chPassed = chQuiz.filter((l) => levels[l.slug]?.passed).length;

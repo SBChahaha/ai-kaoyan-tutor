@@ -50,7 +50,11 @@ export default function ChatPage() {
       const r = await fetch("/api/chat/stream", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: text, noteId: noteId || undefined }),
+        body: JSON.stringify({
+          question: text,
+          noteId: noteId || undefined,
+          history: messages.slice(-8), // 多轮记忆：带上最近对话
+        }),
         signal: controller.signal,
       });
       if (!r.ok || !r.body) {
@@ -84,22 +88,38 @@ export default function ChatPage() {
     abortRef.current?.abort();
   }
 
+  function clearChat() {
+    setMessages([]);
+    setInput("");
+  }
+
   return (
     <div className="mx-auto flex h-[calc(100vh-140px)] max-w-3xl flex-col">
       <div className="mb-3 flex items-center justify-between">
         <h1 className="text-xl font-bold">🤖 AI 答疑</h1>
-        <select
-          value={noteId}
-          onChange={(e) => setNoteId(Number(e.target.value))}
-          className="max-w-[300px] rounded border border-slate-300 px-2 py-1 text-sm"
-        >
-          <option value={0}>不带章节上下文</option>
-          {notes.map((n) => (
-            <option key={n.id} value={n.id}>
-              {n.subject} · {n.chapter}
-            </option>
-          ))}
-        </select>
+        <div className="flex items-center gap-2">
+          {messages.length > 0 && (
+            <button
+              onClick={clearChat}
+              className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs text-slate-500 hover:bg-slate-50"
+              title="清空当前对话（不影响学习数据）"
+            >
+              🗑️ 清空对话
+            </button>
+          )}
+          <select
+            value={noteId}
+            onChange={(e) => setNoteId(Number(e.target.value))}
+            className="max-w-[300px] rounded border border-slate-300 px-2 py-1 text-sm"
+          >
+            <option value={0}>不带章节上下文</option>
+            {notes.map((n) => (
+              <option key={n.id} value={n.id}>
+                {n.subject} · {n.chapter}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div className="flex-1 space-y-3 overflow-y-auto rounded-xl border border-slate-200 bg-white p-4">

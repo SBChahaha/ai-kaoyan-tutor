@@ -11,7 +11,11 @@ const MODEL = process.env.LLM_MODEL || "deepseek-chat";
 // 流式答疑：SSE 输出（打字机效果）
 export async function POST(req: NextRequest) {
   const body = await req.json();
-  const { question, noteId } = body as { question: string; noteId?: number };
+  const { question, noteId, history } = body as {
+    question: string;
+    noteId?: number;
+    history?: { role: string; content: string }[];
+  };
   if (!question?.trim()) {
     return NextResponse.json({ error: "问题不能为空" }, { status: 400 });
   }
@@ -21,7 +25,14 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const messages: ChatMsg[] = [{ role: "system", content: SYSTEM_PROMPT }, ...buildContextMessages(question, noteId)];
+  const hist = (history ?? [])
+    .filter((m) => m.role === "user" || m.role === "assistant")
+    .slice(-8) as ChatMsg[];
+
+  const messages: ChatMsg[] = [
+    { role: "system", content: SYSTEM_PROMPT },
+    ...buildContextMessages(question, noteId, hist),
+  ];
 
   let upstream: Response;
   try {

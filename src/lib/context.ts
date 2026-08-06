@@ -1,10 +1,11 @@
-// 构建答疑上下文：学习状态 + 章节笔记（chat 与 stream 路由共用）
+// 构建答疑上下文：学习状态 + 章节笔记 + 历史对话（chat 与 stream 路由共用）
 import { db, getNote } from "@/lib/db";
 import type { ChatMsg } from "@/lib/llm";
 
 export function buildContextMessages(
   question: string,
-  noteId?: number
+  noteId?: number,
+  history: ChatMsg[] = []
 ): ChatMsg[] {
   const messages: ChatMsg[] = [];
 
@@ -53,6 +54,16 @@ export function buildContextMessages(
       });
       messages.push({ role: "assistant", content: "好的，我已了解当前章节内容，请提问。" });
     }
+  }
+
+  // 历史对话（多轮记忆）：只保留最近的 user/assistant 对
+  if (history.length > 0) {
+    messages.push({
+      role: "user",
+      content: "以下是我们的历史对话，继续回答时请保持连贯：",
+    });
+    messages.push({ role: "assistant", content: "好的，我会结合之前的对话继续。" });
+    messages.push(...history);
   }
 
   messages.push({ role: "user", content: question });

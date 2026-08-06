@@ -75,6 +75,9 @@ export default function LessonViewer({
     return () => window.removeEventListener("keydown", onKey);
   });
 
+  // 📍 scroll-spy：滚动时高亮当前阅读章节
+  const [activeId, setActiveId] = useState<string | null>(null);
+
   async function toggle() {
     const nextDone = !done;
     setDone(nextDone);
@@ -118,6 +121,22 @@ export default function LessonViewer({
         })),
     [content]
   );
+
+  // 📍 scroll-spy：滚动时高亮当前阅读章节（toc 就绪后挂载）
+  useEffect(() => {
+    function onScroll() {
+      let current: string | null = null;
+      for (const t of toc) {
+        const el = document.getElementById(t.id);
+        if (el && el.getBoundingClientRect().top <= 110) current = t.id;
+        else if (el) break;
+      }
+      setActiveId(current);
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [toc]);
 
   return (
     <div className="flex gap-8">
@@ -278,7 +297,11 @@ export default function LessonViewer({
                 <li key={t.id}>
                   <a
                     href={`#${t.id}`}
-                    className="block truncate rounded px-2 py-1 text-slate-600 hover:bg-slate-50 hover:text-blue-600"
+                    className={`block truncate rounded px-2 py-1 ${
+                      activeId === t.id
+                        ? "bg-blue-50 font-semibold text-blue-700"
+                        : "text-slate-600 hover:bg-slate-50 hover:text-blue-600"
+                    }`}
                   >
                     {t.text}
                   </a>
