@@ -27,6 +27,7 @@ export default function QuizClient({
   passPercent: number;
 }) {
   const [questions, setQuestions] = useState<Q[] | null>(null);
+  const [quizTitle, setQuizTitle] = useState("关卡挑战");
   const [variantIndex, setVariantIndex] = useState(0);
   const [variantCount, setVariantCount] = useState(1);
   const [seed, setSeed] = useState(0);
@@ -48,6 +49,7 @@ export default function QuizClient({
     stars: number;
     passed: boolean;
   } | null>(null);
+  const [nextLevel, setNextLevel] = useState<{ slug: string; title: string } | null>(null);
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
@@ -55,6 +57,7 @@ export default function QuizClient({
       .then((r) => r.json())
       .then((d) => {
         setQuestions(d.questions);
+        setQuizTitle(d.title ?? "关卡挑战");
         setVariantIndex(d.variant_index);
         setVariantCount(d.variant_count);
         setSeed(d.seed);
@@ -151,6 +154,7 @@ export default function QuizClient({
         stars: d.stars,
         passed: d.passed,
       });
+      setNextLevel(d.next ?? null);
       setAttempts((a) => [
         {
           id: d.attempt_id,
@@ -234,6 +238,14 @@ export default function QuizClient({
                 🔁 重做这 {wrongCount} 道错题
               </button>
             )}
+            {nextLevel && (
+              <Link
+                href={`/course/${encodeURIComponent(nextLevel.slug)}`}
+                className="rounded-xl bg-green-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-green-700"
+              >
+                下一关：{nextLevel.title} →
+              </Link>
+            )}
             <Link
               href={`/course/${encodeURIComponent(lessonSlug)}`}
               className="rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50"
@@ -310,6 +322,18 @@ export default function QuizClient({
 
   return (
     <div className="mx-auto max-w-2xl">
+      {/* 关卡标题 + 回讲义 */}
+      <div className="mb-3 flex items-center justify-between">
+        <span className="rounded-full bg-indigo-100 px-3 py-1 text-sm font-semibold text-indigo-700">
+          {quizTitle}
+        </span>
+        <Link
+          href={`/course/${encodeURIComponent(lessonSlug)}`}
+          className="text-xs text-blue-600 hover:underline"
+        >
+          📖 回讲义复习 →
+        </Link>
+      </div>
       {/* 进度条 + 变式提示 */}
       <div className="mb-4">
         <div className="mb-1.5 flex items-center justify-between text-sm">

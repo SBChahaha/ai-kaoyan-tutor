@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { db } from "@/lib/db";
 import { SUBJECTS } from "@/lib/config";
+import { listLessons } from "@/lib/course";
 
 const QUIZ_ROOT = path.join(process.cwd(), "content", "quizzes");
 
@@ -302,4 +303,27 @@ export function getAttempts(slug: string): QuizAttempt[] {
   return db
     .prepare("SELECT * FROM quiz_attempts WHERE lesson_slug = ? ORDER BY id DESC")
     .all(slug) as unknown as QuizAttempt[];
+}
+
+// 下一关：当前关卡之后第一个"已解锁未通关"的普通关卡（学习流直达）
+export function getNextLevel(
+  currentSlug: string
+): { slug: string; title: string } | null {
+  try {
+    const lessons = listLessons();
+    const states = getLevelStates(
+      lessons.map((l) => ({ slug: l.slug, title: l.title, subject: l.subject, chapter: l.chapter }))
+    );
+    const idx = states.findIndex((s) => s.slug === currentSlug);
+    if (idx < 0) return null;
+    for (let i = idx + 1; i < states.length; i++) {
+      const s = states[i];
+      if (s.hasQuiz && s.unlocked && !s.passed && !s.isBoss) {
+        return { slug: s.slug, title: s.title };
+      }
+    }
+    return null;
+  } catch {
+    return null;
+  }
 }

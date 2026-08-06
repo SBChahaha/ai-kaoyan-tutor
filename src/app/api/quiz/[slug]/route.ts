@@ -5,6 +5,7 @@ import {
   checkAnswer,
   calcStars,
   getAttempts,
+  getNextLevel,
   type QuizQuestion,
 } from "@/lib/quiz";
 import { db } from "@/lib/db";
@@ -43,6 +44,7 @@ export async function GET(_req: NextRequest, ctx: Ctx) {
 
   return NextResponse.json({
     lesson: quiz.lesson,
+    title: quiz.title ?? "关卡挑战",
     pass_percent: quiz.pass_percent,
     variant_index: variantIndex,
     variant_count: quiz.variants.length,
@@ -214,6 +216,10 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     stars,
     passed,
     pass_percent: passPercent,
+    // 下一关（学习流：通关后直达）
+    next: !practice
+      ? getNextLevel(lessonSlug)
+      : null,
     results: results.map((res) => ({
       ...res,
       explain_ok: res.needs_explanation ? explainOk[res.index] !== false : null,
