@@ -102,6 +102,11 @@ export default function MistakesPage() {
   const shown = filter ? list.filter((m) => m.subject === filter) : list;
   const pendingCount = list.filter((m) => m.status === "pending").length;
 
+  // 错题科目分布
+  const subjectCounts = new Map<string, number>();
+  for (const m of list) subjectCounts.set(m.subject, (subjectCounts.get(m.subject) ?? 0) + 1);
+  const maxSubject = Math.max(1, ...subjectCounts.values());
+
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
@@ -118,6 +123,29 @@ export default function MistakesPage() {
           也可以在聊天里说"整理错题"并贴出题目，AI 会帮你录入。
         </span>
       </div>
+
+      {/* 科目分布 */}
+      {subjectCounts.size > 0 && (
+        <div className="rounded-xl border border-slate-200 bg-white p-4">
+          <div className="mb-2 text-xs text-slate-400">错题科目分布（定位薄弱科目）</div>
+          <div className="space-y-1.5">
+            {Array.from(subjectCounts.entries()).map(([s, n]) => (
+              <div key={s} className="flex items-center gap-2 text-sm">
+                <span className="w-24 shrink-0 truncate text-slate-600">{s}</span>
+                <div className="h-3 flex-1 overflow-hidden rounded-full bg-slate-100">
+                  <div
+                    className={`h-full rounded-full ${
+                      n / maxSubject > 0.7 ? "bg-red-500" : n / maxSubject > 0.4 ? "bg-orange-400" : "bg-blue-400"
+                    }`}
+                    style={{ width: `${(n / maxSubject) * 100}%` }}
+                  />
+                </div>
+                <span className="w-10 shrink-0 text-right text-slate-400">{n} 道</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* 复习模式 */}
       {pendingCount > 0 && (

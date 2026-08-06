@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { listLessons } from "@/lib/course";
 import { computeBadges } from "@/lib/badges";
+import { currentPhase } from "@/lib/config";
 
 // 学习状态摘要：AI 检查入口
 export async function GET() {
@@ -49,6 +50,7 @@ export async function GET() {
       total_attempts: quizAttempts.c,
     },
     badges: computeBadges(),
+    phase: currentPhase(),
     homework: { submitted: homework.c },
     mistakes: { pending: mistakes.c },
     api: {

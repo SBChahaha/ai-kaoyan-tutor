@@ -25,7 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Link href="/" className="text-lg font-bold text-blue-700">
               {APP_NAME}
             </Link>
-            <nav className="flex gap-1 text-sm">
+            <nav className="flex flex-wrap gap-1 text-sm">
               {NAV.map((n) => (
                 <Link
                   key={n.href}
