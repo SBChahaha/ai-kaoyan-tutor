@@ -8,55 +8,69 @@
       "questions": [
         {
           "type": "choice",
-          "question": "f(x) = ln(x + √(x²+1)) 是奇函数，则 f(-2) 与 f(2) 的关系是？",
-          "options": ["f(-2) = -f(2)", "f(-2) = f(2)", "f(-2) = 2f(2)", "无法确定"],
+          "question": "下列函数中，是奇函数的是？",
+          "options": ["f(x) = x² + cos x", "f(x) = ln(x + √(x²+1))", "f(x) = eˣ", "f(x) = |x|"],
+          "answer": 1,
+          "explanation": "ln(x+√(x²+1)) 即反双曲正弦：f(-x) = ln(-x+√(x²+1)) = -f(x)。A 是偶函数（x² 偶 + cos 偶），C 非奇非偶，D 偶。"
+        },
+        {
+          "type": "choice",
+          "question": "设 f(x) 在 x₀ 的某去心邻域内有定义。若极限 lim f(x)（x→x₀）存在，则 f(x) 在 x₀ 处？",
+          "options": ["必连续", "必可导", "必有定义", "在去心邻域内局部有界"],
+          "answer": 3,
+          "explanation": "极限存在的性质：局部有界性（去心邻域内有界）。连续还需 f(x₀) 有定义且极限值=函数值；可导更不用说。极限不要求 x₀ 处有定义。"
+        },
+        {
+          "type": "choice",
+          "question": "lim((1 - cos 2x)/x²)（x→0）的值是？",
+          "options": ["0", "1", "2", "4"],
+          "answer": 2,
+          "explanation": "1 - cos 2x ~ (2x)²/2 = 2x²，答案 2。等价无穷小：1-cos u ~ u²/2，代 u=2x。"
+        },
+        {
+          "type": "choice",
+          "question": "lim(1 + 2/x)ˣ（x→∞）的值是？",
+          "options": ["1", "e", "e²", "∞"],
+          "answer": 2,
+          "explanation": "1^∞ 型：1 + 2/x = 1 + 同款无穷小(2/x)，原式 = [(1+2/x)^(x/2)]² → e²。"
+        },
+        {
+          "type": "choice",
+          "question": "f(x) = (x²-1)/(x²-3x+2) 在 x=1 处的间断点类型是？",
+          "options": ["可去间断点", "跳跃间断点", "无穷间断点", "连续点"],
           "answer": 0,
-          "explanation": "奇函数定义：f(-x) = -f(x)，取 x=2 即得 f(-2) = -f(2)。这考查的是奇函数定义的直接应用。"
+          "explanation": "f(x) = (x-1)(x+1)/((x-1)(x-2)) = (x+1)/(x-2)（x≠1,2），lim(x→1) = 2/(-1) = -2 存在，可去。x=2 处是无穷间断。"
         },
         {
           "type": "choice",
-          "question": "下列函数中，在 (0, +∞) 上单调递减的是？",
-          "options": ["y = x²", "y = eˣ", "y = 1/x", "y = ln x"],
-          "answer": 2,
-          "explanation": "y = 1/x 在 (0,+∞) 上严格递减。x² 与 eˣ 递增，ln x 递增。注意单调性必须指明区间。"
-        },
-        {
-          "type": "choice",
-          "question": "y = lg x² 与 y = 2lg x 的关系是？",
+          "question": "证明方程 eˣ = 3 - x 在 (0, 2) 内有实根，关键是？",
           "options": [
-            "是同一个函数",
-            "定义域不同，不是同一函数",
-            "值域不同，不是同一函数",
-            "对应法则不同，不是同一函数"
+            "f(0) = 1 > 0 且 f(2) = e²-1 > 0，都大于 0",
+            "设 f(x) = eˣ + x - 3，f(0) = -2 < 0，f(2) = e²-1 > 0，异号，零点定理",
+            "f(x) = eˣ 单调递增",
+            "eˣ > 0 恒成立"
           ],
           "answer": 1,
-          "explanation": "前者定义域 {x|x≠0}，后者定义域 {x|x>0}。定义域不同的函数不是同一函数——这是本课最核心的考点。"
+          "explanation": "移项构造 f(x) = eˣ + x - 3：f(0) = -2 < 0，f(2) = e² - 1 > 0，[0,2] 连续且异号，零点定理 ⟹ 存在 ξ ∈ (0,2) 使 f(ξ) = 0。A 端点没算对；C、D 与存在性无关。"
         },
         {
           "type": "choice",
-          "question": "函数 f(x) = sin x 在 [0, 2π] 上有反函数吗？",
-          "options": ["有，反函数是 arcsin x", "没有，因为 sin x 在 [0, 2π] 上不单调", "有，反函数是 2π - arcsin x", "没有，因为 sin x 无界"],
+          "question": "lim(n·sin(1/n))（n→∞）的值是？",
+          "options": ["0", "1", "∞", "不存在"],
           "answer": 1,
-          "explanation": "反函数存在的必要条件是单射。sin x 在 [0, 2π] 上不单调（如 sin 0 = sin π），不是单射，故无反函数。arcsin x 是 sin x 在 [-π/2, π/2] 上的反函数。"
+          "explanation": "令 t = 1/n → 0，原式 = sin t / t → 1（第一个重要极限）。注意不是 n→∞ 时 sin(1/n) ~ 1/n 的简单替换，其实等价无穷小也能做：sin(1/n) ~ 1/n，答案 1——但必须说明 sin(1/n) 是无穷小。"
         },
         {
           "type": "choice",
-          "question": "设 f(x) 是定义在 R 上的奇函数，且 f(1) = 3，则 f(-1) + f(0) = ？",
-          "options": ["6", "0", "-3", "3"],
-          "answer": 1,
-          "explanation": "奇函数 f(0) = 0（因为 f(0) = -f(0)），f(-1) = -f(1) = -3，故 f(-1) + f(0) = -3 + 0 = -3。"
-        },
-        {
-          "type": "choice",
-          "question": "下列命题正确的是？",
+          "question": "下列结论正确的是？",
           "options": [
-            "有界函数必有反函数",
-            "周期函数必有最小正周期",
-            "若 f 以 T 为周期，则 f(2x) 以 T/2 为周期",
-            "偶函数的定义域不必关于原点对称"
+            "f(x) > 0 且连续 ⟹ lim f(x) > 0",
+            "闭区间上连续函数必有最大值",
+            "f(a)·f(b) < 0 ⟹ f 在 (a,b) 内有零点",
+            "lim(f(x)g(x)) = lim f(x) · lim g(x) 无条件成立"
           ],
-          "answer": 2,
-          "explanation": "C：f(2(x+T/2)) = f(2x+T) = f(2x)。A 错：有界与单射无关。B 错：常数函数无反。D 错：奇偶函数定义域必须关于原点对称。"
+          "answer": 1,
+          "explanation": "B 是最值定理（需连续；A 中若区间开/极限点处可能 = 0，严格不等号不保号）。C 缺连续性前提。D 缺两极限都存在的前提。"
         }
       ]
     },
@@ -64,55 +78,59 @@
       "questions": [
         {
           "type": "choice",
-          "question": "f(x) = x·cos x 是奇函数，则 f(-π/2) = ？",
-          "options": ["-f(π/2)", "f(π/2)", "0", "无法确定"],
+          "question": "下列函数中，是偶函数的是？",
+          "options": ["f(x) = x·sin x", "f(x) = eˣ - e⁻ˣ", "f(x) = ln x", "f(x) = x³"],
           "answer": 0,
-          "explanation": "奇函数定义直接应用：f(-x) = -f(x)，取 x = π/2 即得。"
+          "explanation": "x 奇 × sin x 奇 = 偶。B 是奇函数（eˣ-e⁻ˣ 即 2sinh x）。"
         },
         {
           "type": "choice",
-          "question": "函数 y = 1/(1+x²) 在 R 上的值域是？",
-          "options": ["(0, 1]", "[0, 1]", "(0, +∞)", "[1, +∞)"],
-          "answer": 0,
-          "explanation": "1+x² ≥ 1，故 0 < 1/(1+x²) ≤ 1，当 x→±∞ 时趋近 0（取不到），x=0 时取 1，值域 (0,1]。这也是有界性的证明素材。"
-        },
-        {
-          "type": "choice",
-          "question": "y = ln(x² - 3x + 2) 的定义域是？",
-          "options": ["(-∞,1) ∪ (2,+∞)", "(1,2)", "(-∞,2)", "R"],
-          "answer": 0,
-          "explanation": "真数 (x-1)(x-2) > 0，二次不等式解得 x<1 或 x>2。"
-        },
-        {
-          "type": "choice",
-          "question": "下列哪组函数是同一个函数？",
-          "options": [
-            "y = lg x² 与 y = 2lg x",
-            "y = √(x²) 与 y = |x|",
-            "y = (x²-1)/(x-1) 与 y = x+1",
-            "y = lg x 与 y = lg(x²)/2"
-          ],
+          "question": "数列 aₙ = sin n / n 的极限是？",
+          "options": ["1", "0", "不存在", "∞"],
           "answer": 1,
-          "explanation": "B：√(x²) = |x|，定义域都是 R，是同一函数。其余三组定义域都不同。"
+          "explanation": "|sin n| ≤ 1 有界，1/n → 0 无穷小，有界×无穷小 = 无穷小，极限 0。注意不能套 lim(sin x/x) = 1——那是 x→0 的结论。"
         },
         {
           "type": "choice",
-          "question": "若 f(x) 是定义在 [-a, a] 上的任意函数，则 g(x) = [f(x) - f(-x)]/2 是？",
-          "options": ["奇函数", "偶函数", "非奇非偶函数", "无法确定"],
-          "answer": 0,
-          "explanation": "g(-x) = [f(-x) - f(x)]/2 = -g(x)，这是奇偶分解中的奇部构造。本课证明过的定理。"
+          "question": "lim((√(1+x²) - 1)/x²)（x→0）的值是？",
+          "options": ["0", "1/2", "1", "不存在"],
+          "answer": 1,
+          "explanation": "√(1+u) - 1 ~ u/2，代 u = x²：~ x²/2，答案 1/2。"
         },
         {
           "type": "choice",
-          "question": "下列函数中，是初等函数的是？",
-          "options": [
-            "y = |x|",
-            "y = { x, x≥0; -x, x<0 }（分段表示）",
-            "y = [x]（取整函数）",
-            "y = { 1, x 为有理数; 0, x 为无理数 }（狄利克雷函数）"
-          ],
+          "question": "lim(x·(1/x - 1/sin x))（x→0）的值是？",
+          "options": ["0", "1", "-1", "不存在"],
           "answer": 0,
-          "explanation": "y = |x| = √(x²)，由一个式子表示，是初等函数。其余三个都无法用有限次四则与复合的单一式子表示。" 
+          "explanation": "先化简再定型：x·(1/x - 1/sin x) = 1 - x/sin x。x/sin x → 1（第一个重要极限的倒数形式），故原式 = 1 - 1 = 0。教训：能化简先化简，别急着通分洛必达。"
+        },
+        {
+          "type": "choice",
+          "question": "lim(x·sin(1/x))（x→0）与 lim((sin x)/x)（x→0）的关系是？",
+          "options": ["都等于 1", "都等于 0", "前者 0，后者 1", "前者不存在，后者 1"],
+          "answer": 2,
+          "explanation": "x·sin(1/x)：x 无穷小 × sin(1/x) 有界 → 0。sin x/x → 1（第一个重要极限）。两者结构相似但结论不同——关键区别：sin(1/x) 无界但有界（|sin|≤1），而 sin x/x 的分子分母同阶。"
+        },
+        {
+          "type": "choice",
+          "question": "f(x) = { x², x ≠ 1; 3, x = 1 } 在 x=1 处？",
+          "options": ["连续", "可去间断", "跳跃间断", "第二类间断"],
+          "answer": 1,
+          "explanation": "lim(x→1) x² = 1 存在，但 f(1) = 3 ≠ 1。极限存在但 ≠ 函数值 → 可去间断点（把 f(1) 改成 1 就连续）。"
+        },
+        {
+          "type": "choice",
+          "question": "设 f(x) 在 [0,1] 连续，f(0) = f(1)，则下列必成立的是？",
+          "options": ["f(x) 恒为常数", "f(x) 在 (0,1) 内有零点", "存在 ξ ∈ (0,1) 使 f(ξ) = f(ξ + 1/2)", "f(x) ≥ 0"],
+          "answer": 2,
+          "explanation": "这是介值定理的经典应用（平移构造）：设 g(x) = f(x) - f(x+1/2)，g(0) = f(0)-f(1/2)，g(1/2) = f(1/2)-f(1) = f(1/2)-f(0)，两式相加为 0，故 g(0) 与 g(1/2) 异号或为 0，零点定理 ⟹ 存在 ξ。这就是考研著名的'存在 ξ 使 f(ξ) = f(ξ+T/2)'题型。"
+        },
+        {
+          "type": "choice",
+          "question": "lim(arctan x / x)（x→0）的值是？",
+          "options": ["0", "1", "∞", "不存在"],
+          "answer": 1,
+          "explanation": "arctan x ~ x（x→0），答案 1。与 lim(sin x/x) 同族：四个反三角/三角兄弟都等价于 x。"
         }
       ]
     }
