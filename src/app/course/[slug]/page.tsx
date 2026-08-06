@@ -3,9 +3,9 @@ import Link from "next/link";
 import { getLesson, listLessons } from "@/lib/course";
 import { SUBJECT_COLORS } from "@/lib/config";
 import { db } from "@/lib/db";
-import { getLevelStates } from "@/lib/quiz";
+import { getLevelStates, getQuiz } from "@/lib/quiz";
 import LessonViewer from "./LessonViewer";
-import type { HomeworkItem } from "./HomeworkWidget";
+import QuizClient from "./quiz/QuizClient";
 
 export const dynamic = "force-dynamic";
 
@@ -31,15 +31,14 @@ export default async function LessonPage({
     .get(lesson.meta.slug) as { done: number } | undefined;
   const initialDone = !!prog?.done;
 
-  const hw = db
-    .prepare("SELECT * FROM homework WHERE lesson_slug = ? ORDER BY question_index")
-    .all(lesson.meta.slug) as unknown as HomeworkItem[];
+  const hw = null as null; // 作业组件已移除，测试内嵌在课程页
 
   // 关卡状态（决定挑战按钮）
   const states = getLevelStates(
     listLessons().map((l) => ({ slug: l.slug, title: l.title, subject: l.subject }))
   );
   const level = states.find((s) => s.slug === lesson.meta.slug);
+  const quiz = getQuiz(lesson.meta.slug);
 
   return (
     <div>
@@ -61,24 +60,8 @@ export default async function LessonPage({
             </span>
           )}
         </div>
-        <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
+        <div className="mt-2">
           <h1 className="text-2xl font-bold">{lesson.meta.title}</h1>
-          {level?.hasQuiz && level.unlocked && !level.passed && (
-            <Link
-              href={`/course/${encodeURIComponent(lesson.meta.slug)}/quiz`}
-              className="rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-5 py-2.5 text-sm font-bold text-white shadow-sm hover:from-amber-600 hover:to-orange-600"
-            >
-              ⚔️ 开始挑战
-            </Link>
-          )}
-          {level?.hasQuiz && level.passed && (
-            <Link
-              href={`/course/${encodeURIComponent(lesson.meta.slug)}/quiz`}
-              className="rounded-xl border border-amber-300 bg-amber-50 px-5 py-2.5 text-sm font-bold text-amber-700 hover:bg-amber-100"
-            >
-              🏆 冲 3 星（当前 {"★".repeat(level.stars)}）
-            </Link>
-          )}
         </div>
       </div>
 
@@ -88,8 +71,21 @@ export default async function LessonPage({
         prev={prev ? { slug: prev.slug, title: prev.title, subject: prev.subject } : null}
         next={next ? { slug: next.slug, title: next.title, subject: next.subject } : null}
         initialDone={initialDone}
-        initialHomework={hw}
       />
+
+      {/* 内嵌过关测试（纯选择题） */}
+      {quiz && level?.hasQuiz && level.unlocked && (
+        <section className="mt-10 rounded-2xl border-2 border-amber-200 bg-amber-50/40 p-6">
+          <div className="mb-4 text-center">
+            <h2 className="text-xl font-bold text-amber-800">🎯 本课过关测试（选择题）</h2>
+            <p className="mt-1 text-sm text-amber-700/80">
+              共 {quiz.variants[0].length} 题 · 每局随机抽一套变式 · 答对率和理解率都 ≥{" "}
+              {quiz.pass_percent}% 过关 · 全对 3 星
+            </p>
+          </div>
+          <QuizClient lessonSlug={lesson.meta.slug} passPercent={quiz.pass_percent} />
+        </section>
+      )}
     </div>
   );
 }

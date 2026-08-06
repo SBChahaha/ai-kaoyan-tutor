@@ -7,7 +7,6 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
-import HomeworkWidget, { type HomeworkItem } from "./HomeworkWidget";
 
 type Nav = { slug: string; title: string; subject: string } | null;
 
@@ -26,14 +25,12 @@ export default function LessonViewer({
   prev,
   next,
   initialDone,
-  initialHomework,
 }: {
   slug: string;
   content: string;
   prev: Nav;
   next: Nav;
   initialDone: boolean;
-  initialHomework: HomeworkItem[];
 }) {
   const [done, setDone] = useState(initialDone);
   const [saving, setSaving] = useState(false);
@@ -85,9 +82,6 @@ export default function LessonViewer({
               {content}
             </ReactMarkdown>
           </div>
-
-          {/* 作业提交（AI 批改） */}
-          <HomeworkWidget lessonSlug={slug} content={content} initialItems={initialHomework} />
         </div>
 
         {/* 底部操作 */}
