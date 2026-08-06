@@ -63,6 +63,11 @@ export default async function LessonPage({
         </div>
         <div className="mt-2">
           <h1 className="text-2xl font-bold">{lesson.meta.title}</h1>
+          {lesson.mtime && (
+            <div className="mt-0.5 text-xs text-slate-400">
+              更新于 {lesson.mtime.slice(0, 10)} {lesson.mtime.slice(11, 16)}
+            </div>
+          )}
         </div>
       </div>
 

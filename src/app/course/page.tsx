@@ -2,8 +2,8 @@ import Link from "next/link";
 import { listLessons, groupByChapter, getLesson, type LessonMeta } from "@/lib/course";
 import { SUBJECT_COLORS } from "@/lib/config";
 import { db } from "@/lib/db";
-import { getLevelStates, hasQuiz, getBossQuizzes } from "@/lib/quiz";
-import CourseIndexClient, { type LevelInfo } from "./CourseIndexClient";
+import { getLevelStates, hasQuiz, getBossQuizzes, getZhentiQuizzes } from "@/lib/quiz";
+import CourseIndexClient, { type LevelInfo, type ZhentiInfo } from "./CourseIndexClient";
 
 export const dynamic = "force-dynamic";
 
@@ -67,6 +67,22 @@ export default async function CoursePage({
       }
     }
   }
+
+  // 真题专项（独立于闯关链）
+  const zhentiList = getZhentiQuizzes().map((z) => {
+    const b = db
+      .prepare("SELECT stars, passed FROM quiz_attempts WHERE lesson_slug = ? ORDER BY id DESC LIMIT 1")
+      .get(z.slug) as { stars: number; passed: number } | undefined;
+    return {
+      slug: z.slug,
+      title: z.title,
+      year: z.year,
+      subject: z.subject,
+      pass_percent: z.pass_percent,
+      stars: b?.stars ?? 0,
+      passed: !!b?.passed,
+    };
+  });
 
   const total = lessons.length;
   const quizCount = lessons.filter((l) => hasQuiz(l.slug)).length;
@@ -160,6 +176,7 @@ export default async function CoursePage({
         }))}
         levels={levels}
         bosses={bosses}
+        zhenti={zhentiList}
       />
     </div>
   );

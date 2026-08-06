@@ -16,14 +16,14 @@ export default async function QuizPage({
   const lessonSlug = decodeURIComponent(slug);
   const quiz = getQuiz(lessonSlug);
   const lesson = getLesson(lessonSlug);
-  if (!quiz || !lesson) notFound();
+  if (!quiz) notFound();
 
-  // 闯关解锁检查
+  // 闯关解锁检查（仅对挂在课程链上的关卡；真题/独立关默认解锁）
   const states = getLevelStates(
     listLessons().map((l) => ({ slug: l.slug, title: l.title, subject: l.subject }))
   );
   const state = states.find((s) => s.slug === lessonSlug);
-  if (state && state.hasQuiz && !state.unlocked) {
+  if (lesson && state && state.hasQuiz && !state.unlocked) {
     return (
       <div className="mx-auto max-w-md rounded-2xl border border-slate-200 bg-white p-10 text-center">
         <div className="text-4xl">🔒</div>
@@ -41,16 +41,24 @@ export default async function QuizPage({
     );
   }
 
+  const title = lesson?.meta.title ?? quiz.title;
+
   return (
     <div className="space-y-5">
       <div className="mx-auto max-w-2xl">
-        <Link
-          href={`/course/${encodeURIComponent(lessonSlug)}`}
-          className="text-sm text-slate-500 hover:text-blue-600"
-        >
-          ← 返回讲义
-        </Link>
-        <h1 className="mt-1 text-xl font-bold">⚔️ 关卡挑战：{lesson.meta.title}</h1>
+        {lesson ? (
+          <Link
+            href={`/course/${encodeURIComponent(lessonSlug)}`}
+            className="text-sm text-slate-500 hover:text-blue-600"
+          >
+            ← 返回讲义
+          </Link>
+        ) : (
+          <Link href="/course" className="text-sm text-slate-500 hover:text-blue-600">
+            ← 返回课程
+          </Link>
+        )}
+        <h1 className="mt-1 text-xl font-bold">⚔️ {title}</h1>
         <p className="text-sm text-slate-500">
           每局随机抽一套变式 · 答对率和理解率都 ≥ {quiz.pass_percent}% 才算过关 · 全对 3 星
         </p>

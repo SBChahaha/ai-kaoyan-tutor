@@ -14,14 +14,28 @@ export type LevelInfo = {
   isBoss?: boolean;
 };
 
+export type ZhentiInfo = {
+  slug: string;
+  title: string;
+  year: number;
+  subject: string;
+  pass_percent: number;
+  stars: number;
+  passed: boolean;
+};
+
+const MILESTONES = [5, 10, 25, 50, 100, 130];
+
 export default function CourseIndexClient({
   subjects,
   levels,
   bosses,
+  zhenti,
 }: {
   subjects: Subject[];
   levels: Record<string, LevelInfo>;
   bosses: Record<string, { slug: string; title: string; level: LevelInfo }>;
+  zhenti: ZhentiInfo[];
 }) {
   const quizLessons = subjects
     .flatMap((s) => s.chapters.flatMap((c) => c.lessons))
@@ -29,6 +43,7 @@ export default function CourseIndexClient({
   const passedCount = quizLessons.filter((l) => levels[l.slug]?.passed).length;
   const bossPassed = Object.values(bosses).filter((b) => b.level.passed).length;
   const bossTotal = Object.keys(bosses).length;
+  const nextMilestone = MILESTONES.find((m) => m > passedCount) ?? null;
   const total = subjects.reduce(
     (a, s) => a + s.chapters.reduce((b, c) => b + c.lessons.length, 0),
     0
@@ -63,6 +78,11 @@ export default function CourseIndexClient({
         </div>
         <p className="mt-1.5 text-xs text-slate-400">
           每课一关：读讲义 → 挑战 → 过关解锁下一关（🔒 未解锁 · ⚔️ 可挑战 · ⭐ 已通关 · 🔱 章节综合关）
+          {nextMilestone && (
+            <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 font-semibold text-amber-700">
+              🎯 距"通关 {nextMilestone} 关"还差 {nextMilestone - passedCount} 关
+            </span>
+          )}
         </p>
         {flaggedCount > 0 && (
           <p className="mt-1 text-xs text-red-400">📌 有 {flaggedCount} 个难点待复习（见上方清单）</p>
@@ -172,6 +192,53 @@ export default function CourseIndexClient({
           </div>
         </section>
       ))}
+
+      {/* 真题专项 */}
+      {zhenti.length > 0 && (
+        <section>
+          <div className="rounded-t-2xl bg-gradient-to-r from-emerald-600 to-teal-600 p-4 text-white">
+            <h2 className="text-lg font-bold">📜 真题专项</h2>
+            <p className="text-xs text-emerald-100">
+              历年真题（改编）· 独立于闯关链 · 随时可练 · 通过线 {zhenti[0].pass_percent}%
+            </p>
+          </div>
+          <div className="rounded-b-2xl border border-t-0 border-slate-200 bg-white p-4">
+            <ul className="grid gap-1.5 sm:grid-cols-2">
+              {zhenti.map((z) => (
+                <li
+                  key={z.slug}
+                  className={`flex items-center gap-2 rounded-md border px-2 py-1.5 ${
+                    z.passed
+                      ? "border-green-100 bg-green-50/50"
+                      : "border-slate-100 hover:border-emerald-200 hover:bg-emerald-50/40"
+                  }`}
+                >
+                  <span className="text-sm">📜</span>
+                  <Link
+                    href={`/course/${encodeURIComponent(z.slug)}/quiz`}
+                    className="flex-1 truncate text-sm text-slate-700 hover:text-emerald-700"
+                  >
+                    {z.title}
+                    <span className="ml-1 text-xs text-slate-400">
+                      {z.year} · {z.subject}
+                    </span>
+                  </Link>
+                  {z.passed && (
+                    <span className="shrink-0 text-sm text-amber-400">
+                      {"★".repeat(z.stars)}
+                    </span>
+                  )}
+                  {!z.passed && (
+                    <span className="shrink-0 text-xs font-semibold text-emerald-600">
+                      去练习 →
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </section>
+      )}
     </div>
   );
 }

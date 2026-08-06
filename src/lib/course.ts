@@ -14,7 +14,7 @@ export type LessonMeta = {
   file: string;
 };
 
-export type Lesson = { meta: LessonMeta; content: string };
+export type Lesson = { meta: LessonMeta; content: string; mtime: string };
 
 function parseFrontmatter(raw: string): { meta: Record<string, string>; body: string } {
   const m = raw.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
@@ -73,6 +73,7 @@ export function getLesson(slug: string): Lesson | null {
     if (path.basename(file, ".md") === slug) {
       const raw = fs.readFileSync(file, "utf-8");
       const { meta, body } = parseFrontmatter(raw);
+      const stat = fs.statSync(file);
       return {
         meta: {
           slug,
@@ -83,6 +84,7 @@ export function getLesson(slug: string): Lesson | null {
           file,
         },
         content: body,
+        mtime: stat.mtime.toISOString(),
       };
     }
   }

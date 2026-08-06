@@ -23,6 +23,7 @@ export type QuizQuestion =
 
 export type Quiz = {
   lesson: string;
+  title: string;
   pass_percent: number;
   variants: QuizQuestion[][];
 };
@@ -52,6 +53,7 @@ export function getQuiz(slug: string): Quiz | null {
     if (variants.length === 0) return null;
     return {
       lesson: String(data.lesson ?? slug),
+      title: String(data.title ?? "关卡挑战"),
       pass_percent: Number(data.pass_percent ?? 70),
       variants,
     };
@@ -107,6 +109,38 @@ export function getBossQuizzes(): BossQuiz[] {
           chapter: String(data.boss),
           pass_percent: Number(data.pass_percent ?? 70),
           variantCount: Array.isArray(data.variants) ? data.variants.length : 1,
+        });
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+  return out;
+}
+
+// 真题关：quiz JSON 带 zhenti 字段 {year, subject}，地图上显示 📜 标记
+export type ZhentiQuiz = {
+  slug: string;
+  title: string;
+  year: number;
+  subject: string;
+  pass_percent: number;
+};
+
+export function getZhentiQuizzes(): ZhentiQuiz[] {
+  if (!fs.existsSync(QUIZ_ROOT)) return [];
+  const out: ZhentiQuiz[] = [];
+  for (const f of fs.readdirSync(QUIZ_ROOT)) {
+    if (!f.endsWith(".json")) continue;
+    try {
+      const data = JSON.parse(fs.readFileSync(path.join(QUIZ_ROOT, f), "utf-8"));
+      if (data?.zhenti) {
+        out.push({
+          slug: path.basename(f, ".json"),
+          title: String(data.title ?? "真题"),
+          year: Number(data.zhenti.year ?? 0),
+          subject: String(data.zhenti.subject ?? ""),
+          pass_percent: Number(data.pass_percent ?? 60),
         });
       }
     } catch {

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { chat, SYSTEM_PROMPT, type ChatMsg } from "@/lib/llm";
-import { getNote } from "@/lib/db";
+import { getNote, db } from "@/lib/db";
 
 export const runtime = "nodejs";
 
@@ -25,6 +25,39 @@ export async function POST(req: NextRequest) {
     }
 
     const messages: ChatMsg[] = [{ role: "system", content: SYSTEM_PROMPT }];
+
+    // 携带学习状态上下文：当前进度 + 最近错题 + 难点（让 AI 更懂用户）
+    try {
+      const passed = (
+        db
+          .prepare("SELECT COUNT(DISTINCT lesson_slug) AS c FROM quiz_attempts WHERE passed = 1")
+          .get() as { c: number }
+      ).c;
+      const pending = db
+        .prepare("SELECT question, right_answer, wrong_reason FROM mistakes WHERE status = 'pending' ORDER BY id DESC LIMIT 3")
+        .all() as unknown as { question: string; right_answer: string; wrong_reason: string }[];
+      const flagged = db
+        .prepare("SELECT lesson_slug FROM progress WHERE flagged = 1")
+        .all() as unknown as { lesson_slug: string }[];
+      const ctxLines = [
+        `【用户学习状态】已通关 ${passed} 个关卡`,
+        flagged.length ? `【标记的难点章节】${flagged.map((f) => f.lesson_slug).join("、")}` : "",
+        pending.length
+          ? `【最近待复习错题】${pending
+              .map((p) => `《${p.question.slice(0, 40)}》错因:${p.wrong_reason}`)
+              .join("；")}`
+          : "",
+      ].filter(Boolean);
+      if (ctxLines.length > 0) {
+        messages.push({
+          role: "user",
+          content: `${ctxLines.join("\n")}\n\n（以上是用户学习状态上下文，回答时默认用户只掌握了已通关关卡的内容，遇到相关概念要解释清楚）`,
+        });
+        messages.push({ role: "assistant", content: "好的，我已了解你的学习状态，请提问。" });
+      }
+    } catch {
+      /* 上下文增强失败不影响答疑 */
+    }
 
     // 携带当前章节笔记作为上下文
     if (noteId) {
