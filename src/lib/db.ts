@@ -47,6 +47,21 @@ if (!g.__db) {
       task TEXT NOT NULL,
       done INTEGER NOT NULL DEFAULT 0
     );
+    CREATE TABLE IF NOT EXISTS progress (
+      lesson_slug TEXT PRIMARY KEY,
+      done INTEGER NOT NULL DEFAULT 0,
+      updated_at TEXT NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS homework (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      lesson_slug TEXT NOT NULL,
+      question_index INTEGER NOT NULL,
+      answer TEXT NOT NULL,
+      feedback TEXT NOT NULL DEFAULT '',
+      score INTEGER,
+      created_at TEXT NOT NULL,
+      updated_at TEXT NOT NULL
+    );
     CREATE INDEX IF NOT EXISTS idx_notes_subject ON notes(subject);
     CREATE INDEX IF NOT EXISTS idx_mistakes_subject ON mistakes(subject);
     CREATE INDEX IF NOT EXISTS idx_logs_date ON logs(date);

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { db, todayStr } from "@/lib/db";
 import { EXAM_DATE } from "@/lib/config";
+import { listLessons } from "@/lib/course";
 import TodayPlans from "./components/TodayPlans";
 
 export const dynamic = "force-dynamic";
@@ -19,6 +20,15 @@ export default function HomePage() {
     db.prepare("SELECT COUNT(*) AS c FROM mistakes WHERE status = 'pending'").get() as {
       c: number;
     }
+  ).c;
+
+  // 课程进度（服务器端，AI 可查）
+  const lessonTotal = listLessons().length;
+  const lessonDone = (
+    db.prepare("SELECT COUNT(*) AS c FROM progress WHERE done = 1").get() as { c: number }
+  ).c;
+  const homeworkCount = (
+    db.prepare("SELECT COUNT(*) AS c FROM homework").get() as { c: number }
   ).c;
 
   // 最近 7 天学习时长
@@ -57,13 +67,22 @@ export default function HomePage() {
 
       {/* 统计卡片 */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+        <Link href="/course" className="rounded-xl border border-slate-200 bg-white p-4 hover:border-blue-300">
+          <div className="text-xs text-slate-500">课程进度</div>
+          <div className="mt-1 text-2xl font-bold">
+            {lessonDone}
+            <span className="text-sm font-normal text-slate-400">/{lessonTotal} 课</span>
+          </div>
+          <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-100">
+            <div
+              className="h-full rounded-full bg-blue-500"
+              style={{ width: `${lessonTotal ? Math.round((lessonDone / lessonTotal) * 100) : 0}%` }}
+            />
+          </div>
+        </Link>
         <div className="rounded-xl border border-slate-200 bg-white p-4">
-          <div className="text-xs text-slate-500">知识库章节</div>
-          <div className="mt-1 text-2xl font-bold">{noteCount}</div>
-        </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-4">
-          <div className="text-xs text-slate-500">错题总数</div>
-          <div className="mt-1 text-2xl font-bold">{mistakeCount}</div>
+          <div className="text-xs text-slate-500">已交作业</div>
+          <div className="mt-1 text-2xl font-bold">{homeworkCount} 题</div>
         </div>
         <div className="rounded-xl border border-slate-200 bg-white p-4">
           <div className="text-xs text-slate-500">待复习错题</div>

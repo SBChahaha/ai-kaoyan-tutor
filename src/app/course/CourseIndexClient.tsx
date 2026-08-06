@@ -7,32 +7,35 @@ type Lesson = { slug: string; title: string; order: number };
 type Chapter = { chapter: string; lessons: Lesson[] };
 type Subject = { name: string; color: string; chapters: Chapter[] };
 
-const KEY = "kt-course-progress";
+export default function CourseIndexClient({
+  subjects,
+  initialProgress,
+}: {
+  subjects: Subject[];
+  initialProgress: Record<string, boolean>;
+}) {
+  const [progress, setProgress] = useState<Record<string, boolean>>(initialProgress);
 
-export default function CourseIndexClient({ subjects }: { subjects: Subject[] }) {
-  const [progress, setProgress] = useState<Record<string, boolean>>({});
-  const [hydrated, setHydrated] = useState(false);
-
-  useEffect(() => {
-    try {
-      setProgress(JSON.parse(localStorage.getItem(KEY) || "{}"));
-    } catch {
-      setProgress({});
-    }
-    setHydrated(true);
-  }, []);
-
-  function toggle(slug: string) {
+  async function toggle(slug: string) {
     const next = { ...progress, [slug]: !progress[slug] };
     setProgress(next);
-    localStorage.setItem(KEY, JSON.stringify(next));
+    try {
+      await fetch("/api/progress", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lesson_slug: slug, done: next[slug] }),
+      });
+    } catch {
+      setProgress(progress); // 失败回滚
+    }
   }
 
-  const total = subjects.reduce((a, s) => a + s.chapters.reduce((b, c) => b + c.lessons.length, 0), 0);
+  const total = subjects.reduce(
+    (a, s) => a + s.chapters.reduce((b, c) => b + c.lessons.length, 0),
+    0
+  );
   const done = Object.values(progress).filter(Boolean).length;
   const pct = total ? Math.round((done / total) * 100) : 0;
-
-  if (!hydrated) return <div className="p-10 text-center text-slate-400">加载进度…</div>;
 
   return (
     <div className="space-y-8">

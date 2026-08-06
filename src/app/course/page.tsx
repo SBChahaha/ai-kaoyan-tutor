@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { listLessons, groupByChapter, type LessonMeta } from "@/lib/course";
 import { SUBJECT_COLORS } from "@/lib/config";
+import { db } from "@/lib/db";
 import CourseIndexClient from "./CourseIndexClient";
 
 export const dynamic = "force-dynamic";
@@ -9,13 +10,20 @@ export default function CoursePage() {
   const lessons = listLessons();
   const groups = groupByChapter(lessons);
 
-  // 按科目分组（保持 config 中的科目顺序）
   const subjects = new Map<string, { color: string; groups: typeof groups }>();
   for (const g of groups) {
     const s = subjects.get(g.subject) ?? { color: "", groups: [] };
     s.groups.push(g);
     subjects.set(g.subject, s);
   }
+
+  // 服务器端读取进度（AI 可查）
+  const progRows = db.prepare("SELECT lesson_slug, done FROM progress").all() as unknown as {
+    lesson_slug: string;
+    done: number;
+  }[];
+  const initialProgress: Record<string, boolean> = {};
+  for (const p of progRows) initialProgress[p.lesson_slug] = !!p.done;
 
   const total = lessons.length;
 
@@ -34,7 +42,7 @@ export default function CoursePage() {
           </a>
         </p>
         <p className="mt-2 text-xs text-slate-400">
-          学完一课点"标记已学"，进度自动保存在本机浏览器
+          学完一课点"标记已学"，进度保存在服务器，AI 可随时检查
         </p>
       </div>
 
@@ -51,6 +59,7 @@ export default function CoursePage() {
             })),
           })),
         }))}
+        initialProgress={initialProgress}
       />
     </div>
   );

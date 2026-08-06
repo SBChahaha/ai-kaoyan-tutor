@@ -1,16 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
+import HomeworkWidget, { type HomeworkItem } from "./HomeworkWidget";
 
 type Nav = { slug: string; title: string; subject: string } | null;
-
-const KEY = "kt-course-progress";
 
 // 与 markdown 渲染一致的锚点 id 生成（github-slugger 风格）
 function slugify(text: string): string {
@@ -26,33 +25,33 @@ export default function LessonViewer({
   content,
   prev,
   next,
+  initialDone,
+  initialHomework,
 }: {
   slug: string;
   content: string;
   prev: Nav;
   next: Nav;
+  initialDone: boolean;
+  initialHomework: HomeworkItem[];
 }) {
-  const [done, setDone] = useState(false);
-  const [hydrated, setHydrated] = useState(false);
+  const [done, setDone] = useState(initialDone);
+  const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
+  async function toggle() {
+    const nextDone = !done;
+    setDone(nextDone);
+    setSaving(true);
     try {
-      const p = JSON.parse(localStorage.getItem(KEY) || "{}");
-      setDone(!!p[slug]);
+      await fetch("/api/progress", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lesson_slug: slug, done: nextDone }),
+      });
     } catch {
-      setDone(false);
-    }
-    setHydrated(true);
-  }, [slug]);
-
-  function toggle() {
-    try {
-      const p = JSON.parse(localStorage.getItem(KEY) || "{}");
-      p[slug] = !done;
-      localStorage.setItem(KEY, JSON.stringify(p));
-      setDone(!done);
-    } catch {
-      /* ignore */
+      setDone(done);
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -62,7 +61,10 @@ export default function LessonViewer({
       content
         .split("\n")
         .filter((l) => l.startsWith("## "))
-        .map((l) => ({ text: l.replace(/^##\s+/, "").replace(/[#*`]/g, "").trim(), id: slugify(l.replace(/^##\s+/, "")) })),
+        .map((l) => ({
+          text: l.replace(/^##\s+/, "").replace(/[#*`]/g, "").trim(),
+          id: slugify(l.replace(/^##\s+/, "")),
+        })),
     [content]
   );
 
@@ -83,13 +85,16 @@ export default function LessonViewer({
               {content}
             </ReactMarkdown>
           </div>
+
+          {/* 作业提交（AI 批改） */}
+          <HomeworkWidget lessonSlug={slug} content={content} initialItems={initialHomework} />
         </div>
 
         {/* 底部操作 */}
         <div className="mt-4 flex items-center justify-between gap-3">
           <button
             onClick={toggle}
-            disabled={!hydrated}
+            disabled={saving}
             className={`rounded-xl px-5 py-2.5 text-sm font-semibold transition ${
               done
                 ? "bg-green-500 text-white hover:bg-green-600"
