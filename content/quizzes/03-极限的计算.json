@@ -1,0 +1,98 @@
+{
+  "lesson": "03-极限的计算",
+  "pass_percent": 70,
+  "variants": [
+    {
+      "questions": [
+        {
+          "type": "choice",
+          "question": "lim(sin x / x)（x→0）的值是？",
+          "options": ["0", "1", "不存在", "∞"],
+          "answer": 1,
+          "explanation": "第一个重要极限 = 1。注意它是 0/0 型但不能直接代入（得 0/0 无意义），必须用重要极限或等价无穷小。x→∞ 时 sin x / x → 0（有界×无穷小），与 x→0 时结果不同——注意自变量的趋向。"
+        },
+        {
+          "type": "choice",
+          "question": "lim((tan x - sin x)/x³)（x→0）的值是？",
+          "options": ["0", "1/2", "1", "不存在"],
+          "answer": 1,
+          "explanation": "tan x - sin x = tan x(1 - cos x) ~ x · (x²/2) = x³/2，答案 1/2。如果直接替换成 (x - x)/x³ = 0 就错了——加减法不能直接换，要先把公共因子提出来变乘除。这是等价无穷小最经典的陷阱题。"
+        },
+        {
+          "type": "choice",
+          "question": "lim(1 + 3x)^(1/x)（x→0）的值是？",
+          "options": ["1", "e", "e³", "3"],
+          "answer": 2,
+          "explanation": "1^∞ 型，凑第二个重要极限：原式 = [(1+3x)^(1/(3x))]³ → e³。套路：底数凑成 1+同款无穷小，指数是'该无穷小倒数×修正系数'。"
+        },
+        {
+          "type": "choice",
+          "question": "lim((eˣ - 1 - x)/x²)（x→0）的值是？",
+          "options": ["0", "1/2", "1", "不存在"],
+          "answer": 1,
+          "explanation": "不能用 eˣ-1 ~ x（加减法且替换后为 0 明显错）。洛必达两次：第一次 (eˣ-1)/(2x)，第二次 eˣ/2 → 1/2。分子分母差一阶时洛必达更快。"
+        },
+        {
+          "type": "choice",
+          "question": "lim(x·ln x)（x→0⁺）的值是？",
+          "options": ["-∞", "0", "1", "不存在"],
+          "answer": 1,
+          "explanation": "0·∞ 型，转 ln x / (1/x) 用洛必达：(-1/x)/(-1/x²) = -x → 0。x·ln x → 0 是必记结论，后面判敛散、算 xˣ 都用它。"
+        },
+        {
+          "type": "choice",
+          "question": "lim((x+1)/(x-1))ˣ（x→∞）的值是？",
+          "options": ["1", "e", "e²", "∞"],
+          "answer": 2,
+          "explanation": "1^∞ 型：(x+1)/(x-1) = 1 + 2/(x-1)，原式 = [(1+2/(x-1))^((x-1)/2)]^(2x/(x-1)) → e²。凑标准形式后修正指数。"
+        }
+      ]
+    },
+    {
+      "questions": [
+        {
+          "type": "choice",
+          "question": "lim(tan x / x)（x→0）的值是？",
+          "options": ["0", "1", "∞", "不存在"],
+          "answer": 1,
+          "explanation": "tan x ~ x（x→0），比值趋 1。也可以写成 (sin x/x)·(1/cos x) → 1·1 = 1。"
+        },
+        {
+          "type": "choice",
+          "question": "lim((√(1+x) - √(1-x))/sin x)（x→0）的值是？",
+          "options": ["0", "1", "2", "不存在"],
+          "answer": 1,
+          "explanation": "分子有理化：2x/(√(1+x)+√(1-x))，分母 sin x ~ x，原式 = 2/(√(1+x)+√(1-x)) → 2/2 = 1。根号差优先有理化。"
+        },
+        {
+          "type": "choice",
+          "question": "lim((1 - cos x)/x²)（x→0）的值是？",
+          "options": ["0", "1", "1/2", "不存在"],
+          "answer": 2,
+          "explanation": "1 - cos x ~ x²/2，答案 1/2。这是最常用的二阶等价无穷小。也可洛必达两次验证。"
+        },
+        {
+          "type": "choice",
+          "question": "lim xˣ（x→0⁺）的值是？",
+          "options": ["0", "1", "e", "不存在"],
+          "answer": 1,
+          "explanation": "0⁰ 型：ln(xˣ) = x·ln x → 0（0·∞ 型结论），故 xˣ = e^(x ln x) → e⁰ = 1。0⁰ 型取对数转 0·∞。"
+        },
+        {
+          "type": "choice",
+          "question": "lim((x + sin x)/x)（x→∞）的值是？",
+          "options": ["1", "∞", "不存在", "2"],
+          "answer": 0,
+          "explanation": "拆项：1 + sin x / x，sin x 有界、1/x → 0（有界×无穷小），故 → 1。注意这里不能用洛必达——(cos x) 无极限，洛必达失效但原极限存在，要拆项。"
+        },
+        {
+          "type": "choice",
+          "question": "lim n(ⁿ√n - 1)（n→∞）的值是？",
+          "options": ["1", "0", "∞（发散）", "e"],
+          "answer": 2,
+          "explanation": "ⁿ√n = e^(ln n/n)，ln n/n → 0，故 n(e^(ln n/n)-1) ~ n·(ln n/n) = ln n → ∞。陷阱：等价替换后必须重新定型，ln n 是无穷大。"
+        }
+      ]
+    }
+  ]
+}
