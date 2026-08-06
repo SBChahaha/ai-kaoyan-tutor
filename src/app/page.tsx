@@ -10,6 +10,7 @@ import PomodoroCard from "./components/PomodoroCard";
 import BackupRestore from "./components/BackupRestore";
 import QuickAsk from "./components/QuickAsk";
 import BadgeToast from "./components/BadgeToast";
+import Collapsible from "./components/Collapsible";
 
 export const dynamic = "force-dynamic";
 
@@ -107,20 +108,28 @@ export default function HomePage() {
 
       {/* 今日计划 + 学习统计 */}
       <div className="grid gap-4 lg:grid-cols-2">
-        <div className="rounded-xl border border-slate-200 bg-white p-5">
+        <Collapsible id="plans" title="📋 学习清单">
           <TodayPlans />
-        </div>
-        <TodayStats />
+        </Collapsible>
+        <Collapsible id="stats" title="🔥 学习统计">
+          <TodayStats />
+        </Collapsible>
       </div>
 
       {/* 每日回顾 + 成就 */}
       <div className="grid gap-4 lg:grid-cols-2">
-        <DailyReviewCard />
-        <BadgesRow />
+        <Collapsible id="review" title="📚 回顾已学内容">
+          <DailyReviewCard />
+        </Collapsible>
+        <Collapsible id="badges" title="🏆 成就">
+          <BadgesRow />
+        </Collapsible>
       </div>
 
       {/* 番茄钟 */}
-      <PomodoroCard />
+      <Collapsible id="pomodoro" title="🍅 专注计时器">
+        <PomodoroCard />
+      </Collapsible>
 
       {/* 页脚 */}
       <div className="flex items-center justify-between border-t border-slate-200 pt-4 text-xs text-slate-400">
