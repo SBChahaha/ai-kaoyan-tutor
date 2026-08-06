@@ -2,63 +2,6 @@
 export const EXAM_DATE = "2026-12-19";
 export const APP_NAME = "AI 考研助教";
 
-// 备考四阶段（与备考计划一致）
-export const PHASES = [
-  {
-    name: "基础奠基",
-    start: "2026-08-01",
-    end: "2026-08-31",
-    note: "数学一：函数·极限·连续 ｜ 408：数据结构",
-  },
-  {
-    name: "强化提升",
-    start: "2026-09-01",
-    end: "2026-09-30",
-    note: "数学强化 + 408 全面铺开 + 英语真题",
-  },
-  {
-    name: "真题实战",
-    start: "2026-10-01",
-    end: "2026-10-31",
-    note: "近 10 年真题一轮 + 政治启动",
-  },
-  {
-    name: "冲刺押题",
-    start: "2026-11-01",
-    end: "2026-12-19",
-    note: "模拟卷 + 错题回归 + 政治背诵",
-  },
-];
-
-export type Phase = {
-  name: string;
-  note: string;
-  days_total: number;
-  days_left: number;
-  percent: number;
-};
-
-export function currentPhase(now = new Date()): Phase | null {
-  const today = now.toISOString().slice(0, 10);
-  for (const p of PHASES) {
-    if (today >= p.start && today <= p.end) {
-      const total =
-        (new Date(p.end).getTime() - new Date(p.start).getTime()) / 86400000 + 1;
-      const elapsed =
-        (new Date(today).getTime() - new Date(p.start).getTime()) / 86400000 + 1;
-      const daysLeft = Math.max(0, Math.round(total - elapsed + 1));
-      return {
-        name: p.name,
-        note: p.note,
-        days_total: Math.round(total),
-        days_left: daysLeft,
-        percent: Math.min(100, Math.round((elapsed / total) * 100)),
-      };
-    }
-  }
-  return null;
-}
-
 // 科目主题色（课程页 UI）
 export const SUBJECT_COLORS: Record<string, { grad: string; text: string; badge: string }> = {
   "数学一": { grad: "from-indigo-500 to-blue-600", text: "text-indigo-600", badge: "bg-indigo-100 text-indigo-700" },

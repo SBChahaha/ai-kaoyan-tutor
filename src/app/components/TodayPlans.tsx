@@ -9,7 +9,6 @@ export default function TodayPlans() {
   const [subject, setSubject] = useState("数学一");
   const [task, setTask] = useState("");
   const [today, setToday] = useState("");
-  const [recommending, setRecommending] = useState(false);
 
   useEffect(() => {
     const d = new Date();
@@ -44,57 +43,13 @@ export default function TodayPlans() {
 
   const doneCount = plans.filter((p) => p.done).length;
 
-  async function recommend() {
-    setRecommending(true);
-    try {
-      const r = await fetch("/api/recommend");
-      const d = await r.json();
-      const items = (d.suggestions ?? []) as { type: string; text: string }[];
-      // 把推荐任务加入计划（去重）
-      const existing = new Set(plans.map((p) => p.task));
-      const newItems = items.filter((i) => !existing.has(i.text));
-      let added = 0;
-      for (const it of newItems) {
-        const r2 = await fetch("/api/plans", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ date: today, subject: "推荐", task: it.text }),
-        });
-        const { id } = await r2.json();
-        setPlans((p) => [...p, { id, date: today, subject: "推荐", task: it.text, done: 0 }]);
-        added++;
-      }
-      if (added === 0) {
-        const r2 = await fetch("/api/plans", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ date: today, subject: "推荐", task: "今天的任务都已安排，按计划执行 💪" }),
-        });
-        const { id } = await r2.json();
-        setPlans((p) => [...p, { id, date: today, subject: "推荐", task: "今天的任务都已安排，按计划执行 💪", done: 0 }]);
-      }
-    } finally {
-      setRecommending(false);
-    }
-  }
-
   return (
     <div>
       <div className="mb-2 flex items-center justify-between">
-        <h2 className="font-semibold">📋 今日计划</h2>
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-slate-500">
-            {doneCount}/{plans.length} 完成
-          </span>
-          <button
-            onClick={recommend}
-            disabled={recommending}
-            className="rounded-lg bg-violet-600 px-3 py-1 text-xs font-semibold text-white hover:bg-violet-700 disabled:opacity-50"
-            title="根据学习进度自动生成今日任务"
-          >
-            {recommending ? "生成中…" : "🤖 智能推荐"}
-          </button>
-        </div>
+        <h2 className="font-semibold">📋 学习清单</h2>
+        <span className="text-sm text-slate-500">
+          {doneCount}/{plans.length} 完成
+        </span>
       </div>
       <ul className="mb-3 space-y-1.5">
         {plans.map((p) => (

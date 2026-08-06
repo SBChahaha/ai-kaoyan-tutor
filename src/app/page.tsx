@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { db, todayStr } from "@/lib/db";
-import { EXAM_DATE, currentPhase } from "@/lib/config";
+import { EXAM_DATE } from "@/lib/config";
 import { listLessons } from "@/lib/course";
 import TodayPlans from "./components/TodayPlans";
 import TodayStats from "./components/TodayStats";
@@ -51,34 +51,6 @@ export default function HomePage() {
     <div className="space-y-6">
       {/* 快速提问 */}
       <QuickAsk />
-
-      {/* 备考阶段横幅 */}
-      {(() => {
-        const phase = currentPhase();
-        if (!phase) return null;
-        return (
-          <div className="rounded-2xl border border-indigo-200 bg-gradient-to-r from-indigo-50 to-violet-50 p-5">
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <div>
-                <h2 className="font-bold text-indigo-800">
-                  🎯 备考阶段：{phase.name}
-                  <span className="ml-2 text-sm font-normal text-indigo-500">
-                    还剩 {phase.days_left} 天
-                  </span>
-                </h2>
-                <p className="mt-0.5 text-sm text-indigo-600">{phase.note}</p>
-              </div>
-              <span className="text-2xl font-bold text-indigo-700">{phase.percent}%</span>
-            </div>
-            <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-white">
-              <div
-                className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500"
-                style={{ width: `${phase.percent}%` }}
-              />
-            </div>
-          </div>
-        );
-      })()}
 
       {/* 倒计时横幅 */}
       <div className="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white">
@@ -157,6 +129,9 @@ export default function HomePage() {
           <BackupRestore />
           <a href="/api/backup" className="hover:text-blue-600" title="导出全部学习数据备份">
             💾 数据备份
+          </a>
+          <a href="/api/export?type=logs" className="hover:text-blue-600" title="学习日志 CSV">
+            📄 导出 CSV
           </a>
         </div>
       </div>

@@ -1,5 +1,5 @@
 // 成就徽章：从学习数据实时计算
-import { db, getSetting } from "@/lib/db";
+import { db } from "@/lib/db";
 import { listLessons } from "@/lib/course";
 import { getQuiz } from "@/lib/quiz";
 import { getPassedLessons } from "@/lib/daily";
@@ -57,7 +57,6 @@ export function computeBadges(): Badge[] {
   const totalHours = Math.round(
     logs.reduce((s, r) => s + r.hours, 0)
   );
-  const _ = getSetting("daily_target", "8");
 
   return [
     { id: "first", name: "首战告捷", icon: "🏅", desc: "通过第 1 个关卡", earned: passedSet.has("01-函数的概念与性质") || passed.length >= 1 },

@@ -62,10 +62,10 @@ export default function DailyReviewCard() {
     return (
       <div className="rounded-xl border border-green-200 bg-green-50 p-5 text-center">
         <div className="text-2xl">✅</div>
-        <div className="mt-1 font-semibold text-green-800">今日回顾已完成</div>
+        <div className="mt-1 font-semibold text-green-800">回顾已完成</div>
         {data.today_result && (
           <p className="text-sm text-green-600">
-            {data.today_result.score}/{data.today_result.total} 题正确
+            上次回顾：{data.today_result.score}/{data.today_result.total} 题正确
           </p>
         )}
         <button
@@ -85,7 +85,7 @@ export default function DailyReviewCard() {
         <div className="mb-3 text-center">
           <div className="text-2xl">{result.score === result.total ? "🎉" : "👍"}</div>
           <p className="font-semibold">
-            今日回顾：{result.score}/{result.total} 题正确
+            本次回顾：{result.score}/{result.total} 题正确
           </p>
         </div>
         <div className="max-h-64 space-y-2 overflow-y-auto">
@@ -128,7 +128,7 @@ export default function DailyReviewCard() {
     return (
       <div className="rounded-xl border border-slate-200 bg-white p-5">
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="font-semibold">📅 今日回顾（{questions.length} 题）</h3>
+          <h3 className="font-semibold">📚 内容回顾（{questions.length} 题）</h3>
           <button onClick={() => setQuestions(null)} className="text-xs text-slate-400 hover:text-slate-600">
             取消
           </button>
@@ -187,7 +187,7 @@ export default function DailyReviewCard() {
       onClick={start}
       className="w-full rounded-xl border-2 border-dashed border-blue-300 bg-blue-50/50 px-4 py-4 text-sm font-semibold text-blue-700 transition hover:bg-blue-50"
     >
-      📅 今日回顾：从已学内容随机抽 {data.total || 5} 题，检验是否还记得
+      📚 回顾已学内容：随机抽 {data.total || 5} 题，检验还记得多少
     </button>
   );
 }

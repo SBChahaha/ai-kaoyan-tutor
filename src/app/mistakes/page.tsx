@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import ReviewClient from "./ReviewClient";
+import BatchOps from "./BatchOps";
 
 type Mistake = {
   id: number;
@@ -33,6 +34,7 @@ export default function MistakesPage() {
   const [form, setForm] = useState({ ...empty });
   const [busy, setBusy] = useState(false);
   const [aiId, setAiId] = useState<number | null>(null);
+  const [selected, setSelected] = useState<Set<number>>(new Set());
 
   async function load() {
     const r = await fetch("/api/mistakes");
@@ -165,18 +167,52 @@ export default function MistakesPage() {
           onDone={() => {
             load();
             setFilter("");
+            setSelected(new Set());
           }}
         />
       )}
 
+      {/* 批量操作 */}
+      {list.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2">
+          <label className="flex items-center gap-1.5 text-xs text-slate-500">
+            <input
+              type="checkbox"
+              checked={selected.size === list.length && list.length > 0}
+              onChange={(e) =>
+                setSelected(e.target.checked ? new Set(list.map((m) => m.id)) : new Set())
+              }
+              className="accent-blue-600"
+            />
+            全选
+          </label>
+          <BatchOps
+            ids={Array.from(selected)}
+            onDone={() => {
+              setSelected(new Set());
+              load();
+            }}
+          />
+          <span className="text-xs text-slate-400">
+            已选 {selected.size} 道{selected.size > 0 ? "（也可逐题勾选）" : "（勾选后批量操作）"}
+          </span>
+        </div>
+      )}
+
       {/* 导出 */}
       {list.length > 0 && (
-        <div className="flex justify-end">
+        <div className="flex justify-end gap-2">
           <a
             href="/api/mistakes/export"
             className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
           >
             ⬇️ 导出 Markdown
+          </a>
+          <a
+            href="/api/export?type=mistakes"
+            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
+          >
+            ⬇️ 导出 CSV
           </a>
         </div>
       )}
@@ -264,6 +300,18 @@ export default function MistakesPage() {
         {shown.map((m) => (
           <div key={m.id} className="rounded-xl border border-slate-200 bg-white p-4">
             <div className="mb-2 flex flex-wrap items-center gap-2 text-xs">
+              <input
+                type="checkbox"
+                checked={selected.has(m.id)}
+                onChange={(e) => {
+                  const next = new Set(selected);
+                  if (e.target.checked) next.add(m.id);
+                  else next.delete(m.id);
+                  setSelected(next);
+                }}
+                className="accent-blue-600"
+                title="选择后可用批量操作"
+              />
               <span className="rounded bg-blue-100 px-2 py-0.5 text-blue-700">{m.subject}</span>
               {m.chapter && (
                 <span className="rounded bg-slate-100 px-2 py-0.5 text-slate-600">{m.chapter}</span>

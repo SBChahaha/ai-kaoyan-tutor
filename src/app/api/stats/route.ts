@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { db, getSetting } from "@/lib/db";
+import { db } from "@/lib/db";
 
 // 学习统计：连续天数、时长分布、每日目标
 export async function GET() {
@@ -34,7 +34,6 @@ export async function GET() {
 
   const totalHours = Math.round(rows.reduce((s, r) => s + r.hours, 0) * 10) / 10;
   const todayHours = byDate.get(todayStr) ?? 0;
-  const dailyTarget = Number(getSetting("daily_target", "8"));
 
   // 本周 vs 上周
   const day = today.getDay(); // 0=周日
@@ -72,8 +71,6 @@ export async function GET() {
     total_hours: totalHours,
     days_logged: byDate.size,
     today_hours: todayHours,
-    daily_target: dailyTarget,
-    target_met: todayHours >= dailyTarget,
     last_30_days: days,
     week: {
       this_week_hours: thisWeekHours,
