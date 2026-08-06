@@ -90,6 +90,40 @@ export default function LogsPage() {
         </div>
       )}
 
+      {/* 本周总结 */}
+      {chart && "week" in chart && (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <div className="rounded-xl border border-slate-200 bg-white p-3 text-center">
+            <div className="text-lg font-bold text-blue-600">
+              {(chart as unknown as { week: { this_week_hours: number } }).week.this_week_hours}
+              <span className="text-xs font-normal text-slate-400"> h</span>
+            </div>
+            <div className="text-xs text-slate-500">本周学习</div>
+          </div>
+          <div className="rounded-xl border border-slate-200 bg-white p-3 text-center">
+            <div className="text-lg font-bold text-slate-700">
+              {(chart as unknown as { week: { last_week_hours: number } }).week.last_week_hours}
+              <span className="text-xs font-normal text-slate-400"> h</span>
+            </div>
+            <div className="text-xs text-slate-500">上周学习</div>
+          </div>
+          <div className="rounded-xl border border-slate-200 bg-white p-3 text-center">
+            <div className="text-lg font-bold text-emerald-600">
+              {(chart as unknown as { week: { this_week_passed: number } }).week.this_week_passed}
+              <span className="text-xs font-normal text-slate-400"> 关</span>
+            </div>
+            <div className="text-xs text-slate-500">本周通关</div>
+          </div>
+          <div className="rounded-xl border border-slate-200 bg-white p-3 text-center">
+            <div className="text-lg font-bold text-orange-600">
+              {(chart as unknown as { week: { this_week_mistakes: number } }).week.this_week_mistakes}
+              <span className="text-xs font-normal text-slate-400"> 道</span>
+            </div>
+            <div className="text-xs text-slate-500">本周新增错题</div>
+          </div>
+        </div>
+      )}
+
       <div className="rounded-xl border border-slate-200 bg-white p-4">
         <div className="mb-2 flex gap-2">
           <input

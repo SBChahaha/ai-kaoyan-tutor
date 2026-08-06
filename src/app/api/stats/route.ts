@@ -36,6 +36,37 @@ export async function GET() {
   const todayHours = byDate.get(todayStr) ?? 0;
   const dailyTarget = Number(getSetting("daily_target", "8"));
 
+  // 本周 vs 上周
+  const day = today.getDay(); // 0=周日
+  const mondayOffset = (day + 6) % 7;
+  const thisMonday = new Date(today.getTime() - mondayOffset * 86400000);
+  const lastMonday = new Date(thisMonday.getTime() - 7 * 86400000);
+  const fmt2 = (d: Date) => {
+    const p = (n: number) => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  };
+  const thisWeekHours = Math.round(
+    rows.filter((r) => r.date >= fmt2(thisMonday)).reduce((s, r) => s + r.hours, 0) * 10
+  ) / 10;
+  const lastWeekHours =
+    Math.round(
+      rows
+        .filter((r) => r.date >= fmt2(lastMonday) && r.date < fmt2(thisMonday))
+        .reduce((s, r) => s + r.hours, 0) * 10
+    ) / 10;
+  const weekPassed = (
+    db
+      .prepare(
+        "SELECT COUNT(DISTINCT lesson_slug) AS c FROM quiz_attempts WHERE passed = 1 AND created_at >= ?"
+      )
+      .get(new Date(thisMonday).toISOString()) as { c: number }
+  ).c;
+  const weekMistakes = (
+    db
+      .prepare("SELECT COUNT(*) AS c FROM mistakes WHERE created_at >= ?")
+      .get(new Date(thisMonday).toISOString()) as { c: number }
+  ).c;
+
   return NextResponse.json({
     streak,
     total_hours: totalHours,
@@ -44,5 +75,11 @@ export async function GET() {
     daily_target: dailyTarget,
     target_met: todayHours >= dailyTarget,
     last_30_days: days,
+    week: {
+      this_week_hours: thisWeekHours,
+      last_week_hours: lastWeekHours,
+      this_week_passed: weekPassed,
+      this_week_mistakes: weekMistakes,
+    },
   });
 }

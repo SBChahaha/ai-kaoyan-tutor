@@ -102,7 +102,7 @@ export default function LessonViewer({
         </div>
 
         {/* 底部操作 */}
-        <div className="mt-4 flex items-center justify-between gap-3">
+        <div className="no-print mt-4 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <button
               onClick={toggle}
@@ -125,6 +125,13 @@ export default function LessonViewer({
               title="标记为难点，出现在课程页难点清单"
             >
               {flagged ? "📌 已标难点（点击取消）" : "📌 标记难点"}
+            </button>
+            <button
+              onClick={() => window.print()}
+              className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+              title="打印讲义（自动隐藏导航和按钮）"
+            >
+              🖨️ 打印
             </button>
           </div>
           <div className="text-xs text-slate-400">

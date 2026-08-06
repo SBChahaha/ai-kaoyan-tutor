@@ -114,6 +114,16 @@ export default function HomePage() {
 
       {/* 番茄钟 */}
       <PomodoroCard />
+
+      {/* 页脚 */}
+      <div className="flex items-center justify-between border-t border-slate-200 pt-4 text-xs text-slate-400">
+        <span>
+          距离初试还有 <b className="text-slate-600">{daysLeft}</b> 天 · 坚持就是胜利
+        </span>
+        <a href="/api/backup" className="hover:text-blue-600" title="导出全部学习数据备份">
+          💾 数据备份
+        </a>
+      </div>
     </div>
   );
 }
