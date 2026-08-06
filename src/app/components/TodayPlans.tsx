@@ -20,6 +20,13 @@ export default function TodayPlans() {
       .then(setPlans);
   }, []);
 
+  // 本地日期（不能用 toISOString——UTC 会跨天）
+  function localToday(): string {
+    const d = new Date();
+    const p = (n: number) => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+  }
+
   async function addPlan() {
     if (!task.trim()) return;
     const r = await fetch("/api/plans", {
@@ -88,9 +95,9 @@ export default function TodayPlans() {
             ✅ 一键全完成
           </button>
         )}
-        {today !== new Date().toISOString().slice(0, 10).replace("T", " ") && (
+        {today !== localToday() && (
           <button
-            onClick={() => loadDate(new Date().toISOString().slice(0, 10))}
+            onClick={() => loadDate(localToday())}
             className="rounded-lg border border-slate-300 px-3 py-1 text-xs text-slate-500 hover:bg-slate-50"
           >
             回到今天
