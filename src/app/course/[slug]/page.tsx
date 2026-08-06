@@ -39,6 +39,13 @@ export default async function LessonPage({
     listLessons().map((l) => ({ slug: l.slug, title: l.title, subject: l.subject, chapter: l.chapter }))
   );
   const level = states.find((s) => s.slug === lesson.meta.slug);
+
+  // 本章待复习错题数（复习联动）
+  const chapterMistakes = (
+    db
+      .prepare("SELECT COUNT(*) AS c FROM mistakes WHERE chapter = ? AND status = 'pending'")
+      .get(lesson.meta.chapter) as { c: number }
+  ).c;
   const quiz = getQuiz(lesson.meta.slug);
 
   return (
@@ -87,6 +94,16 @@ export default async function LessonPage({
         </span>
         <span className="text-sm text-slate-500">本课全部知识点的完整讲解与证明</span>
       </div>
+      {/* 本章错题提醒 */}
+      {chapterMistakes > 0 && (
+        <Link
+          href="/mistakes"
+          className="mb-4 flex items-center gap-2 rounded-xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-700 transition hover:bg-orange-100"
+        >
+          ⚠️ 本章还有 <b>{chapterMistakes}</b> 道错题待复习，去错题本看看 →
+        </Link>
+      )}
+
       <LessonViewer
         slug={lesson.meta.slug}
         content={lesson.content}

@@ -138,8 +138,28 @@ export default function LessonViewer({
     return () => window.removeEventListener("scroll", onScroll);
   }, [toc]);
 
+  // 📖 阅读进度条：随滚动填充顶部
+  const [progress, setProgress] = useState(0);
+  useEffect(() => {
+    function onScroll() {
+      const h = document.documentElement;
+      const total = h.scrollHeight - h.clientHeight;
+      setProgress(total > 0 ? Math.min(100, Math.round((h.scrollTop / total) * 100)) : 0);
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
     <div className="flex gap-8">
+      {/* 阅读进度条 */}
+      <div className="no-print fixed left-0 top-0 z-50 h-0.5 w-full bg-slate-100">
+        <div
+          className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-[width] duration-150"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
       {/* 正文 */}
       <article className="min-w-0 flex-1">
         {/* 阅读工具栏：字号 + 夜间 + 快捷键提示 */}

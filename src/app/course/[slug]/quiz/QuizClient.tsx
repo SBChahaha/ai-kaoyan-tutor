@@ -38,6 +38,7 @@ export default function QuizClient({
   const [explanations, setExplanations] = useState<(string | null)[]>([]);
   const [current, setCurrent] = useState(0);
   const [result, setResult] = useState<Result[] | null>(null);
+  const [practiceMode, setPracticeMode] = useState(false);
   const [summary, setSummary] = useState<{
     score: number;
     total: number;
@@ -137,7 +138,7 @@ export default function QuizClient({
       const r = await fetch(`/api/quiz/${encodeURIComponent(lessonSlug)}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ seed, answers, explanations }),
+        body: JSON.stringify({ seed, answers, explanations, practice: practiceMode }),
       });
       const d = await r.json();
       setResult(d.results);
@@ -171,6 +172,23 @@ export default function QuizClient({
     window.location.reload(); // 重新抽变式
   }
 
+  // 🔁 重做错题：把答错/蒙对的题单独再测一轮（练习模式，不写库）
+  function retryWrong() {
+    if (!result || !questions) return;
+    const wrongIdx = result.filter((r) => !r.correct || r.guessed).map((r) => r.index);
+    if (wrongIdx.length === 0) return;
+    const sub = wrongIdx.map((i) => questions[i]);
+    setQuestions(sub);
+    setAnswers(sub.map(() => null));
+    setExplanations(sub.map(() => null));
+    setCurrent(0);
+    setResult(null);
+    setSummary(null);
+    setPracticeMode(true);
+  }
+
+  const wrongCount = result ? result.filter((r) => !r.correct || r.guessed).length : 0;
+
   const stars = summary?.stars ?? 0;
 
   // ===== 结果页 =====
@@ -199,18 +217,28 @@ export default function QuizClient({
           {summary.explain_note && (
             <p className="mt-1 text-xs text-slate-400">{summary.explain_note}</p>
           )}
-          <div className="mt-5 flex justify-center gap-3">
-            <button
-              onClick={retry}
-              className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
-            >
-              {summary.passed ? "再抽一套（冲 3 星）" : "重新挑战（换一套题）"}
-            </button>
+          <div className="mt-5 flex flex-wrap justify-center gap-3">
+            {!practiceMode && (
+              <button
+                onClick={retry}
+                className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700"
+              >
+                {summary.passed ? "再抽一套（冲 3 星）" : "重新挑战（换一套题）"}
+              </button>
+            )}
+            {!practiceMode && wrongCount > 0 && (
+              <button
+                onClick={retryWrong}
+                className="rounded-xl bg-amber-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-amber-600"
+              >
+                🔁 重做这 {wrongCount} 道错题
+              </button>
+            )}
             <Link
               href={`/course/${encodeURIComponent(lessonSlug)}`}
               className="rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-600 hover:bg-slate-50"
             >
-              返回讲义
+              {practiceMode ? "完成练习" : "返回讲义"}
             </Link>
           </div>
         </div>
@@ -289,8 +317,9 @@ export default function QuizClient({
             第 {current + 1}/{questions.length} 题
           </span>
           <span className="text-xs text-slate-400">
-            变式 {variantIndex + 1}/{variantCount} · 通过线 {passPercent}%
-            · 快捷键 A-D 选 / Enter 下一题
+            {practiceMode
+              ? `🔁 错题重做模式 · 共 ${questions.length} 题（不记闯关记录）`
+              : `变式 ${variantIndex + 1}/${variantCount} · 通过线 ${passPercent}% · 快捷键 A-D 选 / Enter 下一题`}
           </span>
         </div>
         <div className="h-2 overflow-hidden rounded-full bg-slate-200">

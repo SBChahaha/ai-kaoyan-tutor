@@ -103,6 +103,7 @@ export async function POST(req: NextRequest, ctx: Ctx) {
   const answers = (body.answers ?? []) as (string | number | null)[];
   const explanations = (body.explanations ?? []) as (string | null)[];
   const seed = Number(body.seed ?? 0);
+  const practice = body.practice === true; // 练习模式：判分但不写库
 
   const { questions } = pickVariant(quiz, seed);
 
@@ -139,30 +140,32 @@ export async function POST(req: NextRequest, ctx: Ctx) {
   const passed = percent >= passPercent && explainRate >= passPercent;
   const stars = passed ? calcStars(Math.min(percent, explainRate), passPercent) : 0;
 
-  const r = db
-    .prepare(
-      `INSERT INTO quiz_attempts (lesson_slug, score, total, percent, stars, passed, answers, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
-    )
-    .run(
-      lessonSlug,
-      score,
-      total,
-      percent,
-      stars,
-      passed ? 1 : 0,
-      JSON.stringify({ answers, explanations, seed, explainRate }),
-      new Date().toISOString()
-    );
+  const r = practice
+    ? { lastInsertRowid: 0 }
+    : db
+        .prepare(
+          `INSERT INTO quiz_attempts (lesson_slug, score, total, percent, stars, passed, answers, created_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+        )
+        .run(
+          lessonSlug,
+          score,
+          total,
+          percent,
+          stars,
+          passed ? 1 : 0,
+          JSON.stringify({ answers, explanations, seed, explainRate }),
+          new Date().toISOString()
+        );
 
-  if (passed) {
+  if (!practice && passed) {
     db.prepare(
       `INSERT INTO progress (lesson_slug, done, updated_at) VALUES (?, 1, ?)
        ON CONFLICT(lesson_slug) DO UPDATE SET done = 1, updated_at = excluded.updated_at`
     ).run(lessonSlug, new Date().toISOString());
   }
 
-  // 📝 自动整理错题本：答错 / 疑似蒙对的题自动入库（零手动录入）
+  // 📝 自动整理错题本：答错 / 疑似蒙对的题自动入库（零手动录入；练习模式不写库）
   const lesson = getLesson(lessonSlug);
   const subject = lesson?.meta.subject ?? "";
   const chapter = lesson?.meta.chapter ?? "";
@@ -171,32 +174,34 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     `INSERT INTO mistakes (subject, chapter, question, my_answer, right_answer, wrong_reason, ai_analysis, status, options, created_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)`
   );
-  for (const res of results) {
-    const guessed =
-      res.correct && res.needs_explanation && explainOk[res.index] === false;
-    if (res.correct && !guessed) continue; // 真对的跳过
-    if (findMistake.get(res.question)) continue; // 已存在跳过（去重）
-    const myAnswer =
-      res.type === "choice" && res.given !== null
-        ? (questions[res.index] as Extract<QuizQuestion, { type: "choice" }>).options?.[
-            Number(res.given)
-          ] ?? String(res.given)
-        : String(res.given ?? "未作答");
-    addMistake.run(
-      subject,
-      chapter,
-      res.question,
-      myAnswer,
-      res.correct_answer,
-      guessed ? "闯关答对但解释不过关（疑似蒙对）" : "闯关测试答错",
-      res.explanation,
-      res.type === "choice"
-        ? JSON.stringify(
-            (questions[res.index] as Extract<QuizQuestion, { type: "choice" }>).options
-          )
-        : "",
-      new Date().toISOString()
-    );
+  if (!practice) {
+    for (const res of results) {
+      const guessed =
+        res.correct && res.needs_explanation && explainOk[res.index] === false;
+      if (res.correct && !guessed) continue; // 真对的跳过
+      if (findMistake.get(res.question)) continue; // 已存在跳过（去重）
+      const myAnswer =
+        res.type === "choice" && res.given !== null
+          ? (questions[res.index] as Extract<QuizQuestion, { type: "choice" }>).options?.[
+              Number(res.given)
+            ] ?? String(res.given)
+          : String(res.given ?? "未作答");
+      addMistake.run(
+        subject,
+        chapter,
+        res.question,
+        myAnswer,
+        res.correct_answer,
+        guessed ? "闯关答对但解释不过关（疑似蒙对）" : "闯关测试答错",
+        res.explanation,
+        res.type === "choice"
+          ? JSON.stringify(
+              (questions[res.index] as Extract<QuizQuestion, { type: "choice" }>).options
+            )
+          : "",
+        new Date().toISOString()
+      );
+    }
   }
 
   return NextResponse.json({
