@@ -41,14 +41,6 @@ export default async function QuizPage({
     );
   }
 
-  const attempts = getAttempts(lessonSlug);
-
-  const questions = quiz.questions.map((q) =>
-    q.type === "choice"
-      ? { type: q.type, question: q.question, options: q.options }
-      : { type: q.type, question: q.question }
-  );
-
   return (
     <div className="space-y-5">
       <div className="mx-auto max-w-2xl">
@@ -60,24 +52,10 @@ export default async function QuizPage({
         </Link>
         <h1 className="mt-1 text-xl font-bold">⚔️ 关卡挑战：{lesson.meta.title}</h1>
         <p className="text-sm text-slate-500">
-          共 {questions.length} 题 · 通过线 {quiz.pass_percent}% · 全对 3 星
+          每局随机抽一套变式 · 答对率和理解率都 ≥ {quiz.pass_percent}% 才算过关 · 全对 3 星
         </p>
       </div>
-      <QuizClient
-        lessonSlug={lessonSlug}
-        lessonTitle={lesson.meta.title}
-        questions={questions}
-        passPercent={quiz.pass_percent}
-        initialAttempts={attempts.map((a) => ({
-          id: a.id,
-          score: a.score,
-          total: a.total,
-          percent: a.percent,
-          stars: a.stars,
-          passed: !!a.passed,
-          created_at: a.created_at,
-        }))}
-      />
+      <QuizClient lessonSlug={lessonSlug} passPercent={quiz.pass_percent} />
     </div>
   );
 }

@@ -23,7 +23,7 @@ export type QuizQuestion =
 export type Quiz = {
   lesson: string;
   pass_percent: number;
-  questions: QuizQuestion[];
+  variants: QuizQuestion[][];
 };
 
 export type QuizAttempt = {
@@ -42,10 +42,41 @@ export function getQuiz(slug: string): Quiz | null {
   const file = path.join(QUIZ_ROOT, `${slug}.json`);
   if (!fs.existsSync(file)) return null;
   try {
-    return JSON.parse(fs.readFileSync(file, "utf-8")) as Quiz;
+    const data = JSON.parse(fs.readFileSync(file, "utf-8")) as Record<string, unknown>;
+    const variants = Array.isArray(data.variants)
+      ? (data.variants as { questions: QuizQuestion[] }[]).map((v) => v.questions)
+      : Array.isArray(data.questions)
+        ? [(data.questions as unknown) as QuizQuestion[]]
+        : [];
+    if (variants.length === 0) return null;
+    return {
+      lesson: String(data.lesson ?? slug),
+      pass_percent: Number(data.pass_percent ?? 70),
+      variants,
+    };
   } catch {
     return null;
   }
+}
+
+// 种子随机数（mulberry32）——同一 seed 得到同一变式，保证提交时判分一致
+function mulberry32(seed: number) {
+  let a = seed >>> 0;
+  return function () {
+    a |= 0;
+    a = (a + 0x6d2b79f5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+export function pickVariant(
+  quiz: Quiz,
+  seed: number
+): { questions: QuizQuestion[]; variantIndex: number } {
+  const idx = Math.floor(mulberry32(seed)() * quiz.variants.length);
+  return { questions: quiz.variants[idx], variantIndex: idx };
 }
 
 export function hasQuiz(slug: string): boolean {

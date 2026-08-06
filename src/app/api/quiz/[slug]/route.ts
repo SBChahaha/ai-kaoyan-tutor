@@ -1,23 +1,36 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getQuiz, checkAnswer, calcStars, getAttempts } from "@/lib/quiz";
+import {
+  getQuiz,
+  pickVariant,
+  checkAnswer,
+  calcStars,
+  getAttempts,
+  type QuizQuestion,
+} from "@/lib/quiz";
 import { db } from "@/lib/db";
+import { chat, type ChatMsg } from "@/lib/llm";
 
 export const runtime = "nodejs";
 
 type Ctx = { params: Promise<{ slug: string }> };
 
-// GET：题目列表（不含答案）+ 历史尝试
+// GET：随机变式的题目（不含答案）+ 历史尝试
 export async function GET(_req: NextRequest, ctx: Ctx) {
   const { slug } = await ctx.params;
-  const quiz = getQuiz(decodeURIComponent(slug));
+  const lessonSlug = decodeURIComponent(slug);
+  const quiz = getQuiz(lessonSlug);
   if (!quiz) return NextResponse.json({ error: "该课程没有关卡" }, { status: 404 });
 
-  const questions = quiz.questions.map((q) =>
+  const seed = Math.floor(Math.random() * 1e9);
+  const { questions, variantIndex } = pickVariant(quiz, seed);
+
+  const clean = questions.map((q) =>
     q.type === "choice"
       ? { type: q.type, question: q.question, options: q.options }
       : { type: q.type, question: q.question }
   );
-  const attempts = getAttempts(decodeURIComponent(slug)).map((a) => ({
+
+  const attempts = getAttempts(lessonSlug).map((a) => ({
     id: a.id,
     score: a.score,
     total: a.total,
@@ -30,22 +43,70 @@ export async function GET(_req: NextRequest, ctx: Ctx) {
   return NextResponse.json({
     lesson: quiz.lesson,
     pass_percent: quiz.pass_percent,
+    variant_index: variantIndex,
+    variant_count: quiz.variants.length,
+    seed,
     total: questions.length,
-    questions,
+    questions: clean,
     attempts,
   });
 }
 
-// POST：提交作答，服务端判分，记录闯关
+// AI 审查选择题解释：判断是否真正理解（非蒙对）
+async function gradeExplanations(
+  questions: QuizQuestion[],
+  explanations: (string | null)[]
+): Promise<{ ok: Record<number, boolean>; note: string }> {
+  const ok: Record<number, boolean> = {};
+  const reqIdx = questions
+    .map((q, i) => (q.type === "choice" ? i : -1))
+    .filter((i) => i >= 0);
+  if (reqIdx.length === 0) return { ok, note: "" };
+
+  const lines = reqIdx.map((i) => {
+    const q = questions[i] as Extract<QuizQuestion, { type: "choice" }>;
+    return `题${i + 1}：${q.question}\n选项：${q.options.join(" / ")}\n学生的选择：${q.options[Number(explanations[i] ?? -1)] ?? "未选"}\n学生的解释：${explanations[i] ?? "（未填写）"}`;
+  });
+
+  const prompt = `你是严格的考研数学老师。下面是学生选择题的作答与解释。请判断每个解释是否真正体现了理解（有推理过程、能说明为什么对/为什么其他选项错），而不是蒙对或复述选项。
+要求：每题只输出一行，格式：题号|通过|原因（通过/不通过，原因一句话）
+${lines.join("\n\n")}`;
+
+  try {
+    const raw = await chat([{ role: "user", content: prompt }]);
+    let parsed = 0;
+    for (const line of raw.split("\n")) {
+      const m = line.match(/^\s*(\d+)\s*[|：:]\s*(通过|不通过|未通过)\s*[|：:]\s*(.*)$/);
+      if (!m) continue;
+      const idx = Number(m[1]) - 1;
+      ok[idx] = m[2] === "通过";
+      parsed++;
+    }
+    if (parsed < reqIdx.length) {
+      return { ok, note: `（AI 解析不完整 ${parsed}/${reqIdx.length}，未解析的题按通过处理）` };
+    }
+    return { ok, note: "" };
+  } catch {
+    return { ok: {}, note: "（AI 不可用，本次解释不判分）" };
+  }
+}
+
+// POST：提交作答 + 解释，服务端判分（答案 + 理解双重判定）
 export async function POST(req: NextRequest, ctx: Ctx) {
   const { slug } = await ctx.params;
-  const quiz = getQuiz(decodeURIComponent(slug));
+  const lessonSlug = decodeURIComponent(slug);
+  const quiz = getQuiz(lessonSlug);
   if (!quiz) return NextResponse.json({ error: "该课程没有关卡" }, { status: 404 });
 
   const body = await req.json();
   const answers = (body.answers ?? []) as (string | number | null)[];
+  const explanations = (body.explanations ?? []) as (string | null)[];
+  const seed = Number(body.seed ?? 0);
 
-  const results = quiz.questions.map((q, i) => {
+  const { questions } = pickVariant(quiz, seed);
+
+  // 答案判分
+  const results = questions.map((q, i) => {
     const given = answers[i] ?? null;
     const correct = checkAnswer(q, given);
     return {
@@ -54,19 +115,28 @@ export async function POST(req: NextRequest, ctx: Ctx) {
       question: q.question,
       given,
       correct,
-      // 提交后展示正确答案与解析（学习用途）
-      correct_answer:
-        q.type === "choice" ? q.options[q.answer] : q.answer.join(" 或 "),
+      correct_answer: q.type === "choice" ? q.options[q.answer] : q.answer.join(" 或 "),
       explanation: q.explanation,
+      needs_explanation: q.type === "choice",
     };
   });
 
   const score = results.filter((r) => r.correct).length;
-  const total = quiz.questions.length;
+  const total = questions.length;
   const percent = Math.round((score / total) * 100);
+
+  // 理解判分（AI 审查解释）
+  const { ok: explainOk, note: explainNote } = await gradeExplanations(questions, explanations);
+  const reqCount = results.filter((r) => r.needs_explanation).length;
+  const explainPass = reqCount
+    ? results.filter((r) => r.needs_explanation && explainOk[r.index] !== false).length
+    : 0;
+  const explainRate = reqCount ? Math.round((explainPass / reqCount) * 100) : 100;
+
+  // 过关 = 答对率达标 且 理解率达标
   const passPercent = quiz.pass_percent ?? 70;
-  const stars = calcStars(percent, passPercent);
-  const passed = percent >= passPercent;
+  const passed = percent >= passPercent && explainRate >= passPercent;
+  const stars = passed ? calcStars(Math.min(percent, explainRate), passPercent) : 0;
 
   const r = db
     .prepare(
@@ -74,22 +144,21 @@ export async function POST(req: NextRequest, ctx: Ctx) {
        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
     )
     .run(
-      decodeURIComponent(slug),
+      lessonSlug,
       score,
       total,
       percent,
       stars,
       passed ? 1 : 0,
-      JSON.stringify(answers),
+      JSON.stringify({ answers, explanations, seed, explainRate }),
       new Date().toISOString()
     );
 
-  // 过关自动标记"已学"
   if (passed) {
     db.prepare(
       `INSERT INTO progress (lesson_slug, done, updated_at) VALUES (?, 1, ?)
        ON CONFLICT(lesson_slug) DO UPDATE SET done = 1, updated_at = excluded.updated_at`
-    ).run(decodeURIComponent(slug), new Date().toISOString());
+    ).run(lessonSlug, new Date().toISOString());
   }
 
   return NextResponse.json({
@@ -97,9 +166,16 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     score,
     total,
     percent,
+    explain_rate: explainRate,
+    explain_note: explainNote,
     stars,
     passed,
     pass_percent: passPercent,
-    results,
+    results: results.map((res) => ({
+      ...res,
+      explain_ok: res.needs_explanation ? explainOk[res.index] !== false : null,
+      // 答对但解释不过关 = 蒙的
+      guessed: res.correct && res.needs_explanation && explainOk[res.index] === false,
+    })),
   });
 }

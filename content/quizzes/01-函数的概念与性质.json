@@ -1,56 +1,109 @@
 {
   "lesson": "01-函数的概念与性质",
   "pass_percent": 70,
-  "questions": [
+  "variants": [
     {
-      "type": "choice",
-      "question": "下列哪组函数是同一个函数？",
-      "options": [
-        "y = lg x² 与 y = 2lg x",
-        "y = (x²-1)/(x-1) 与 y = x+1",
-        "y = |x| 与 y = √(x²)",
-        "y = √(x²) 与 y = x"
-      ],
-      "answer": 2,
-      "explanation": "两个函数相同 ⟺ 定义域相同且对应法则相同。A 定义域不同（x≠0 vs x>0）；B 定义域不同（x≠1 vs R）；D 对应法则不同（√(x²)=|x| ≠ x，当 x<0 时）。C：|x| = √(x²)，定义域都是 R，是同一个函数。"
+      "questions": [
+        {
+          "type": "choice",
+          "question": "下列哪组函数是同一个函数？",
+          "options": [
+            "y = lg x² 与 y = 2lg x",
+            "y = (x²-1)/(x-1) 与 y = x+1",
+            "y = |x| 与 y = √(x²)",
+            "y = √(x²) 与 y = x"
+          ],
+          "answer": 2,
+          "explanation": "两个函数相同 ⟺ 定义域相同且对应法则相同。A 定义域不同（x≠0 vs x>0）；B 定义域不同（x≠1 vs R）；D 对应法则不同（√(x²)=|x| ≠ x，当 x<0 时）。C：|x| = √(x²)，定义域都是 R，是同一个函数。"
+        },
+        {
+          "type": "choice",
+          "question": "f(x) = ln(x + √(x²+1)) 的奇偶性是？",
+          "options": ["奇函数", "偶函数", "非奇非偶函数", "既奇又偶函数"],
+          "answer": 0,
+          "explanation": "分子有理化：-x+√(x²+1) = 1/(x+√(x²+1))，故 f(-x) = -f(x)。这是反双曲正弦 arsinh x，是奇函数。"
+        },
+        {
+          "type": "choice",
+          "question": "下列函数在 R 上有界的是？",
+          "options": ["y = x²", "y = 1/x", "y = sin x + cos x", "y = eˣ"],
+          "answer": 2,
+          "explanation": "sin x + cos x = √2·sin(x+π/4)，|y| ≤ √2，有界。x² 与 eˣ 无上界；1/x 在 x=0 处无定义且无界。注意：说'函数有界'必须带区间，这里区间是 R。"
+        },
+        {
+          "type": "choice",
+          "question": "关于周期函数，下列说法正确的是？",
+          "options": [
+            "周期函数的和一定是周期函数",
+            "y = sin 2x 的周期是 2π",
+            "若 f 以 T 为周期，则 f(ax+b) 以 T/|a| 为周期",
+            "周期函数必有最小正周期"
+          ],
+          "answer": 2,
+          "explanation": "C 正确：f(ax+b) 中自变量增加 T/|a| 时，ax+b 增加 ±T，函数值复原。A 错：sin x + cos(πx) 无周期。B 错：sin 2x 周期为 π。D 错：常数函数没有最小正周期。"
+        },
+        {
+          "type": "fill",
+          "question": "f(x) = sin x / (1 + x²) 是____函数（填：奇 / 偶）",
+          "answer": ["奇"],
+          "explanation": "定义域 R 关于原点对称；f(-x) = sin(-x)/(1+(-x)²) = -sin x/(1+x²) = -f(x)。"
+        },
+        {
+          "type": "fill",
+          "question": "y = lg x² 的定义域是____（填写：x≠0 或 x>0）",
+          "answer": ["x≠0", "x!=0", "x<>0", "(-∞,0)∪(0,+∞)"],
+          "explanation": "x² > 0 对一切 x≠0 成立，故定义域为 {x | x≠0}。而 y = 2lg x 要求 x>0——这就是两者不是同一函数的原因。"
+        }
+      ]
     },
     {
-      "type": "choice",
-      "question": "f(x) = ln(x + √(x²+1)) 的奇偶性是？",
-      "options": ["奇函数", "偶函数", "非奇非偶函数", "既奇又偶函数"],
-      "answer": 0,
-      "explanation": "分子有理化：-x+√(x²+1) = 1/(x+√(x²+1))，故 f(-x) = -f(x)。这是反双曲正弦 arsinh x，是奇函数。"
-    },
-    {
-      "type": "choice",
-      "question": "下列函数在 R 上有界的是？",
-      "options": ["y = x²", "y = 1/x", "y = sin x + cos x", "y = eˣ"],
-      "answer": 2,
-      "explanation": "sin x + cos x = √2·sin(x+π/4)，|y| ≤ √2，有界。x² 与 eˣ 无上界；1/x 在 x=0 处无定义且无界。注意：说'函数有界'必须带区间，这里区间是 R。"
-    },
-    {
-      "type": "choice",
-      "question": "关于周期函数，下列说法正确的是？",
-      "options": [
-        "周期函数的和一定是周期函数",
-        "y = sin 2x 的周期是 2π",
-        "若 f 以 T 为周期，则 f(ax+b) 以 T/|a| 为周期",
-        "周期函数必有最小正周期"
-      ],
-      "answer": 2,
-      "explanation": "C 正确：f(ax+b) 中自变量增加 T/|a| 时，ax+b 增加 ±T，函数值复原。A 错：sin x + cos(πx) 无周期（周期比 π 为无理数）。B 错：sin 2x 周期为 π。D 错：常数函数是周期函数但没有最小正周期。"
-    },
-    {
-      "type": "fill",
-      "question": "f(x) = sin x / (1 + x²) 是____函数（填：奇 / 偶）",
-      "answer": ["奇"],
-      "explanation": "定义域 R 关于原点对称；f(-x) = sin(-x)/(1+(-x)²) = -sin x/(1+x²) = -f(x)。"
-    },
-    {
-      "type": "fill",
-      "question": "y = lg x² 的定义域是____（填写：x≠0 或 x>0）",
-      "answer": ["x≠0", "x!=0", "x<>0", "(-∞,0)∪(0,+∞)"],
-      "explanation": "x² > 0 对一切 x≠0 成立，故定义域为 {x | x≠0}。而 y = 2lg x 要求 x>0——这就是两者不是同一函数的原因。"
+      "questions": [
+        {
+          "type": "choice",
+          "question": "下列哪组函数是同一个函数？",
+          "options": [
+            "y = lg x² 与 y = 2lg x",
+            "y = √(x²) 与 y = |x|",
+            "y = (x²-1)/(x-1) 与 y = x+1",
+            "y = lg x 与 y = lg(x²)/2"
+          ],
+          "answer": 1,
+          "explanation": "B：√(x²) = |x|，定义域都是 R，是同一个函数。A 定义域不同（x≠0 vs x>0）；C 定义域不同（x≠1 vs R）；D 定义域不同（x>0 vs x≠0）。"
+        },
+        {
+          "type": "choice",
+          "question": "f(x) = x·cos x 的奇偶性是？",
+          "options": ["奇函数", "偶函数", "非奇非偶函数", "既奇又偶函数"],
+          "answer": 0,
+          "explanation": "x 是奇函数，cos x 是偶函数，奇×偶 = 奇；且定义域 R 关于原点对称，故 f(-x) = (-x)·cos(-x) = -x·cos x = -f(x)。"
+        },
+        {
+          "type": "choice",
+          "question": "下列函数在 R 上有界的是？",
+          "options": ["y = x·sin x", "y = 1/(1+x²)", "y = 2ˣ", "y = tan x"],
+          "answer": 1,
+          "explanation": "1/(1+x²)：因为 1+x² ≥ 1，故 0 < 1/(1+x²) ≤ 1，有界。x·sin x 无界（取 x=2kπ+π/2 时值趋于无穷）；2ˣ 无上界；tan x 无界。"
+        },
+        {
+          "type": "choice",
+          "question": "y = sin 2x 的最小正周期是？",
+          "options": ["2π", "π", "π/2", "4π"],
+          "answer": 1,
+          "explanation": "由'f 以 T 为周期 ⟹ f(ax+b) 以 T/|a| 为周期'：sin x 周期 2π，故 sin 2x 周期 = 2π/2 = π。"
+        },
+        {
+          "type": "fill",
+          "question": "f(x) = x³ 是____函数（填：奇 / 偶）",
+          "answer": ["奇"],
+          "explanation": "f(-x) = (-x)³ = -x³ = -f(x)，且定义域 R 对称，故为奇函数。"
+        },
+        {
+          "type": "fill",
+          "question": "y = ln(x² - 3x + 2) 的定义域是____（填写：x<1或x>2 或 (-∞,1)∪(2,+∞)）",
+          "answer": ["x<1或x>2", "x<1或x>2", "(-∞,1)∪(2,+∞)", "x<1orx>2", "x<1 or x>2"],
+          "explanation": "真数 x²-3x+2 = (x-1)(x-2) > 0，解得 x<1 或 x>2。"
+        }
+      ]
     }
   ]
 }
