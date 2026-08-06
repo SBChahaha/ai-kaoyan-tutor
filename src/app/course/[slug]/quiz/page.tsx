@@ -20,7 +20,7 @@ export default async function QuizPage({
 
   // 闯关解锁检查（仅对挂在课程链上的关卡；真题/独立关默认解锁）
   const states = getLevelStates(
-    listLessons().map((l) => ({ slug: l.slug, title: l.title, subject: l.subject }))
+    listLessons().map((l) => ({ slug: l.slug, title: l.title, subject: l.subject, chapter: l.chapter }))
   );
   const state = states.find((s) => s.slug === lessonSlug);
   if (lesson && state && state.hasQuiz && !state.unlocked) {

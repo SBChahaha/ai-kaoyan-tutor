@@ -102,6 +102,15 @@ export default function MistakesPage() {
   const shown = filter ? list.filter((m) => m.subject === filter) : list;
   const pendingCount = list.filter((m) => m.status === "pending").length;
 
+  // 逾期天数（待复习超过 3 天）
+  function overdueDays(createdAt: string): number {
+    const d = (Date.now() - new Date(createdAt).getTime()) / 86400000;
+    return Math.max(0, Math.floor(d - 3));
+  }
+  const overdueCount = list.filter(
+    (m) => m.status === "pending" && overdueDays(m.created_at) > 0
+  ).length;
+
   // 错题科目分布
   const subjectCounts = new Map<string, number>();
   for (const m of list) subjectCounts.set(m.subject, (subjectCounts.get(m.subject) ?? 0) + 1);
@@ -113,6 +122,9 @@ export default function MistakesPage() {
         <h1 className="text-xl font-bold">✍️ 错题本</h1>
         <div className="text-sm text-slate-500">
           待复习 <span className="font-bold text-orange-600">{pendingCount}</span> 道
+          {overdueCount > 0 && (
+            <span className="ml-1 font-bold text-red-600">· 逾期 {overdueCount} 道 ⏰</span>
+          )}
         </div>
       </div>
 
@@ -263,6 +275,11 @@ export default function MistakesPage() {
               >
                 {m.status === "pending" ? "待复习" : "已复习"}
               </span>
+              {m.status === "pending" && overdueDays(m.created_at) > 0 && (
+                <span className="rounded bg-red-100 px-2 py-0.5 font-semibold text-red-600">
+                  ⏰ 已逾期 {overdueDays(m.created_at)} 天
+                </span>
+              )}
               <span className="text-slate-400">{m.created_at.slice(0, 10)}</span>
               <div className="ml-auto flex gap-1.5">
                 <button

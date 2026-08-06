@@ -25,6 +25,15 @@ export async function GET() {
   const mistakes = db.prepare("SELECT COUNT(*) AS c FROM mistakes WHERE status = 'pending'").get() as {
     c: number;
   };
+  // 逾期错题：待复习超过 3 天
+  const overdueCutoff = new Date(Date.now() - 3 * 86400000).toISOString();
+  const mistakesOverdue = (
+    db
+      .prepare(
+        "SELECT COUNT(*) AS c FROM mistakes WHERE status = 'pending' AND created_at < ?"
+      )
+      .get(overdueCutoff) as { c: number }
+  ).c;
   const homework = db.prepare("SELECT COUNT(*) AS c FROM homework").get() as { c: number };
   const quiz = db
     .prepare(
@@ -52,7 +61,7 @@ export async function GET() {
     badges: computeBadges(),
     phase: currentPhase(),
     homework: { submitted: homework.c },
-    mistakes: { pending: mistakes.c },
+    mistakes: { pending: mistakes.c, overdue: mistakesOverdue },
     api: {
       lessons: "/api/course",
       progress: "/api/progress",

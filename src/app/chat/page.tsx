@@ -19,26 +19,31 @@ export default function ChatPage() {
     fetch("/api/notes")
       .then((r) => r.json())
       .then((rows: Note[]) => setNotes(rows));
-    // 从 URL 参数带过来章节（知识库页面跳转）
+    // 从 URL 参数带过来章节（知识库页面跳转）或问题（首页快速提问）
     const m = window.location.search.match(/note=(\d+)/);
     if (m) setNoteId(Number(m[1]));
+    const q = new URLSearchParams(window.location.search).get("q");
+    if (q) {
+      setInput(q);
+      setTimeout(() => doAsk(q), 100);
+    }
   }, []);
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, busy]);
 
   async function send() {
     const q = input.trim();
     if (!q || busy) return;
-    setMessages((m) => [...m, { role: "user", content: q }]);
+    await doAsk(q);
+  }
+
+  async function doAsk(text: string) {
+    setMessages((m) => [...m, { role: "user", content: text }]);
     setInput("");
     setBusy(true);
     try {
       const r = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: q, noteId: noteId || undefined }),
+        body: JSON.stringify({ question: text, noteId: noteId || undefined }),
       });
       const data = await r.json();
       setMessages((m) => [...m, { role: "assistant", content: data.answer ?? data.error ?? "出错了" }]);

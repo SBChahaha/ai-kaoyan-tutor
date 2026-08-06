@@ -8,7 +8,7 @@ import { isReviewDoneToday } from "@/lib/daily";
 export async function GET() {
   const lessons = listLessons();
   const states = getLevelStates(
-    lessons.map((l) => ({ slug: l.slug, title: l.title, subject: l.subject }))
+    lessons.map((l) => ({ slug: l.slug, title: l.title, subject: l.subject, chapter: l.chapter }))
   );
 
   // 第一个已解锁未过关的关卡

@@ -36,7 +36,7 @@ export default async function LessonPage({
 
   // 关卡状态（决定挑战按钮）
   const states = getLevelStates(
-    listLessons().map((l) => ({ slug: l.slug, title: l.title, subject: l.subject }))
+    listLessons().map((l) => ({ slug: l.slug, title: l.title, subject: l.subject, chapter: l.chapter }))
   );
   const level = states.find((s) => s.slug === lesson.meta.slug);
   const quiz = getQuiz(lesson.meta.slug);
@@ -59,6 +59,15 @@ export default async function LessonPage({
             <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-700">
               {level.passed ? `已通关 ${"★".repeat(level.stars)}` : level.unlocked ? "⚔️ 可挑战" : "🔒 未解锁"}
             </span>
+          )}
+          {level?.passed && (
+            <Link
+              href={`/course/${encodeURIComponent(lesson.meta.slug)}/quiz`}
+              className="rounded-full bg-violet-100 px-2.5 py-0.5 text-xs font-semibold text-violet-700 hover:bg-violet-200"
+              title="重考刷新星级"
+            >
+              🔁 刷星
+            </Link>
           )}
         </div>
         <div className="mt-2">

@@ -8,6 +8,7 @@ import DailyReviewCard from "./components/DailyReviewCard";
 import BadgesRow from "./components/BadgesRow";
 import PomodoroCard from "./components/PomodoroCard";
 import BackupRestore from "./components/BackupRestore";
+import QuickAsk from "./components/QuickAsk";
 
 export const dynamic = "force-dynamic";
 
@@ -48,6 +49,9 @@ export default function HomePage() {
 
   return (
     <div className="space-y-6">
+      {/* 快速提问 */}
+      <QuickAsk />
+
       {/* 备考阶段横幅 */}
       {(() => {
         const phase = currentPhase();

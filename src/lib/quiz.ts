@@ -238,7 +238,7 @@ export function getLevelStates(
     g.lessons.push(l);
     byChapter.set(key, g);
   }
-  // 章节顺序：SUBJECTS 配置顺序
+  // 章节顺序：SUBJECTS 配置顺序；未匹配到的章节兜底附加（防漏传 chapter 丢课）
   const orderedChapters: string[] = [];
   const bosses = getBossQuizzes();
   for (const s of SUBJECTS) {
@@ -246,6 +246,9 @@ export function getLevelStates(
       const key = chapterKey(s.name, ch);
       if (byChapter.has(key)) orderedChapters.push(key);
     }
+  }
+  for (const key of byChapter.keys()) {
+    if (!orderedChapters.includes(key)) orderedChapters.push(key);
   }
 
   for (const key of orderedChapters) {
