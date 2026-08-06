@@ -20,6 +20,7 @@ export default function DailyReviewCard() {
     results: { lesson: string; question: string; given: number | null; correct: boolean; correct_answer: string; explanation: string }[];
   } | null>(null);
   const [busy, setBusy] = useState(false);
+  const [errMsg, setErrMsg] = useState("");
 
   useEffect(() => {
     fetch("/api/daily-review")
@@ -36,6 +37,7 @@ export default function DailyReviewCard() {
     setQuestions(d.questions);
     setAnswers(d.questions.map(() => -1));
     setResult(null);
+    setErrMsg("");
   }
 
   async function submit() {
@@ -48,6 +50,14 @@ export default function DailyReviewCard() {
         body: JSON.stringify({ seed: data.seed, answers }),
       });
       const d = await r.json();
+      if (!r.ok) {
+        // 409：今天已记录（再练不计分）——回到已完成视图，不崩溃
+        setErrMsg(d.error ?? "提交失败");
+        setQuestions(null);
+        setResult(null);
+        setData((s) => (s ? { ...s, done: true } : s));
+        return;
+      }
       setResult(d);
       setData((s) => (s ? { ...s, done: true, today_result: { score: d.score, total: d.total } } : s));
     } finally {
@@ -68,6 +78,7 @@ export default function DailyReviewCard() {
             上次回顾：{data.today_result.score}/{data.today_result.total} 题正确
           </p>
         )}
+        {errMsg && <p className="mt-1 text-xs text-amber-600">⚠️ {errMsg}</p>}
         <button
           onClick={start}
           className="mt-3 rounded-lg border border-green-300 px-4 py-1.5 text-xs text-green-700 hover:bg-green-100"

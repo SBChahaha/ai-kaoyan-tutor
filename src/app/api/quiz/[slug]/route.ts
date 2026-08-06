@@ -6,10 +6,11 @@ import {
   calcStars,
   getAttempts,
   getNextLevel,
+  getLevelStates,
   type QuizQuestion,
 } from "@/lib/quiz";
 import { db } from "@/lib/db";
-import { getLesson } from "@/lib/course";
+import { getLesson, listLessons } from "@/lib/course";
 import { chat, type ChatMsg } from "@/lib/llm";
 
 export const runtime = "nodejs";
@@ -113,6 +114,29 @@ export async function POST(req: NextRequest, ctx: Ctx) {
     : rawAnswers.map(() => null);
   const seed = Number(body.seed ?? 0);
   const practice = body.practice === true; // 练习模式：判分但不写库
+
+  // 解锁校验：未解锁的关卡禁止提交（BOSS 关需本章全过；真题关独立不受限）
+  if (!practice && !quiz.zhenti) {
+    try {
+      const states = getLevelStates(
+        listLessons().map((l) => ({
+          slug: l.slug,
+          title: l.title,
+          subject: l.subject,
+          chapter: l.chapter,
+        }))
+      );
+      const st = states.find((s) => s.slug === lessonSlug);
+      if (st && !st.unlocked) {
+        return NextResponse.json(
+          { error: "该关卡尚未解锁，请先通过前一关" },
+          { status: 403 }
+        );
+      }
+    } catch {
+      /* 校验失败不阻塞（本地单用户） */
+    }
+  }
 
   const { questions } = pickVariant(quiz, seed);
 

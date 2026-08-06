@@ -27,6 +27,8 @@ export type Quiz = {
   title: string;
   pass_percent: number;
   variants: QuizQuestion[][];
+  boss?: string;
+  zhenti?: { year: number; subject: string };
 };
 
 export type QuizAttempt = {
