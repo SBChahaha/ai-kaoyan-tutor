@@ -1,0 +1,98 @@
+{
+  "lesson": "03-反常积分",
+  "pass_percent": 70,
+  "variants": [
+    {
+      "questions": [
+        {
+          "type": "choice",
+          "question": "∫₁^(+∞) 1/x dx 的敛散性是？",
+          "options": ["收敛，值为 1", "发散", "收敛，值为 0", "收敛，值为 π"],
+          "answer": 1,
+          "explanation": "p 积分 p=1 是分界线：∫₁^∞ (1/x^p)dx，p≤1 发散。1/x 是调和发散的原型——函数趋于 0 但面积无限积累。"
+        },
+        {
+          "type": "choice",
+          "question": "∫₁^(+∞) 1/x² dx = ？",
+          "options": ["1", "2", "发散", "1/2"],
+          "answer": 0,
+          "explanation": "p=2>1 收敛。计算：[-1/x]₁^b → 1。反常积分计算 = 定积分 + 取极限。"
+        },
+        {
+          "type": "choice",
+          "question": "∫₀¹ 1/x² dx 的敛散性是？",
+          "options": ["收敛，值为 1", "收敛，值为 2", "发散", "收敛，值为 -1"],
+          "answer": 2,
+          "explanation": "x=0 是无界函数反常积分的瑕点：p=2≥1 发散。注意：直接代牛顿-莱布尼茨会得 -1（荒谬——被积函数恒正积分不可能为负），必须先确认无瑕点。"
+        },
+        {
+          "type": "choice",
+          "question": "∫₀¹ 1/√x dx = ？",
+          "options": ["1", "2", "发散", "1/2"],
+          "answer": 1,
+          "explanation": "x=0 瑕点，p=1/2<1 收敛。计算：lim(ε→0) 2√x|ε¹ = 2。无界函数 p 积分：p<1 收敛。"
+        },
+        {
+          "type": "choice",
+          "question": "∫₁^(+∞) (x+√x)/(x²+1) dx 的敛散性是？",
+          "options": ["收敛", "发散", "收敛且值为 1", "无法判断"],
+          "answer": 1,
+          "explanation": "抓大头：(x+√x)/(x²+1) ~ 1/x（x→∞），与 1/x 同阶。极限比较法：同敛散，1/x 发散 ⟹ 发散。"
+        },
+        {
+          "type": "choice",
+          "question": "∫₁^(+∞) arctan x / x² dx 的敛散性是？",
+          "options": ["发散", "收敛", "无法判断", "等于 π/2"],
+          "answer": 1,
+          "explanation": "arctan x ≤ π/2 有界，被积函数 ≤ (π/2)/x²，而 ∫1/x² 收敛（p=2>1），比较判别法 ⟹ 收敛。有界函数乘收敛积分仍收敛。"
+        }
+      ]
+    },
+    {
+      "questions": [
+        {
+          "type": "choice",
+          "question": "∫₁^(+∞) ln x / x² dx = ？",
+          "options": ["1", "发散", "0", "ln 2"],
+          "answer": 0,
+          "explanation": "分部积分：[-ln x/x]₁^∞ + ∫₁^∞ 1/x² dx = 0 + 1 = 1。注意 lim(ln x/x) = 0（对数增长慢于任何幂函数）。"
+        },
+        {
+          "type": "choice",
+          "question": "∫₂^(+∞) dx/(x·ln x) 的敛散性是？",
+          "options": ["收敛", "发散", "收敛且值为 1", "无法判断"],
+          "answer": 1,
+          "explanation": "换元 u=ln x：∫ du/u = ln(ln x)，b→∞ 时 → ∞ 发散。注意：(ln x) 在分母一次幂时发散，与 1/x 同构。"
+        },
+        {
+          "type": "choice",
+          "question": "∫₂^(+∞) dx/(x·(ln x)²) 的敛散性是？",
+          "options": ["发散", "收敛，值为 1/ln 2", "收敛，值为 1", "无法判断"],
+          "answer": 1,
+          "explanation": "换元 u=ln x：∫du/u² = -1/u = -1/ln x，代上限 → 1/ln 2 收敛。(ln x)^p 分母时 p>1 收敛——与 p 积分同构。"
+        },
+        {
+          "type": "choice",
+          "question": "∫₀^(+∞) e^(-x) dx = ？",
+          "options": ["1", "0", "发散", "e"],
+          "answer": 0,
+          "explanation": "lim(b→∞) (1 - e^(-b)) = 1。指数衰减（e^(-kx), k>0）比任何幂函数都快，无穷限积分必收敛。"
+        },
+        {
+          "type": "choice",
+          "question": "∫₀¹ ln x / √x dx 的敛散性是？",
+          "options": ["发散", "收敛", "无法判断", "等于 -1"],
+          "answer": 1,
+          "explanation": "x=0 瑕点。|ln x| ≤ C/x^(1/4)（充分小时），故 |ln x/√x| ≤ C/x^(3/4)，p=3/4<1 收敛。必记结论：ln x 不影响敛散性（不卡分界线时）。"
+        },
+        {
+          "type": "choice",
+          "question": "∫₀^(+∞) x·e^(-x) dx = ？",
+          "options": ["1", "0", "发散", "2"],
+          "answer": 0,
+          "explanation": "分部积分：[-xe^(-x)]₀^∞ + ∫₀^∞ e^(-x)dx = 0 + 1 = 1。lim(b→∞)be^(-b) = 0（指数衰减压过线性增长）。推广：∫xⁿe^(-x)dx = n!。"
+        }
+      ]
+    }
+  ]
+}

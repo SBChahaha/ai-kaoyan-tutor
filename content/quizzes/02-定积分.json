@@ -1,0 +1,103 @@
+{
+  "lesson": "02-定积分",
+  "pass_percent": 70,
+  "variants": [
+    {
+      "questions": [
+        {
+          "type": "choice",
+          "question": "f(x) 在 [a,b] 上可积的充分条件是？",
+          "options": [
+            "f 在 [a,b] 上有界",
+            "f 在 [a,b] 上有界且只有有限个间断点",
+            "f 在 (a,b) 内可导",
+            "f 在 [a,b] 上有原函数"
+          ],
+          "answer": 1,
+          "explanation": "有界+有限间断点是考研标准可积判定（充分条件）。A 只要求有界不够（黎曼函数反例）；有原函数 ≠ 可积（两者无包含关系）。"
+        },
+        {
+          "type": "choice",
+          "question": "(d/dx)∫₀^(x²) sin t dt = ？",
+          "options": ["sin(x²)", "2x·sin(x²)", "2x·cos(x²)", "sin(x²)·x²"],
+          "answer": 1,
+          "explanation": "变上限求导：上限代入 × 上限的导数 = sin(x²) × 2x。这是变上限积分求导最常考的公式。"
+        },
+        {
+          "type": "choice",
+          "question": "lim(x→0) (∫₀ˣ e^(t²)dt)/x = ？",
+          "options": ["0", "1", "e", "不存在"],
+          "answer": 1,
+          "explanation": "0/0 型洛必达：分子求导 = e^(x²)，分母求导 = 1，x→0 时 e^(x²)→1。变上限积分出现在极限里一律洛必达。"
+        },
+        {
+          "type": "choice",
+          "question": "∫₀^(π/2) sin²x dx = ？",
+          "options": ["π/4", "π/2", "1/2", "π"],
+          "answer": 0,
+          "explanation": "降幂：sin²x = (1-cos2x)/2，积分 = [x/2 - sin2x/4]₀^(π/2) = π/4。也可用华里士公式 n=2 偶数：(1/2)(π/2)=π/4。"
+        },
+        {
+          "type": "choice",
+          "question": "f(x) 是连续奇函数，则 ∫₋₁¹ f(x)dx = ？",
+          "options": ["2∫₀¹ f(x)dx", "0", "f(0)", "无法确定"],
+          "answer": 1,
+          "explanation": "奇函数在对称区间 [-a,a] 上积分为 0（左右面积抵消）。偶函数才是 2∫₀ᵃ。"
+        },
+        {
+          "type": "choice",
+          "question": "设 F(x) = ∫₀ˣ (x-t)f(t)dt（f 连续），则 F''(x) = ？",
+          "options": ["f(x)", "xf(x)", "f'(x)", "∫₀ˣ f(t)dt"],
+          "answer": 0,
+          "explanation": "先拆出 x：F = x∫₀ˣf - ∫₀ˣtf。F' = ∫₀ˣf + xf - xf = ∫₀ˣf（两项抵消），F'' = f(x)。被积函数含 x 先拆再求导。"
+        }
+      ]
+    },
+    {
+      "questions": [
+        {
+          "type": "choice",
+          "question": "∫₀¹ √(1-x²) dx = ？",
+          "options": ["1", "π/4", "π/2", "1/2"],
+          "answer": 1,
+          "explanation": "几何意义：单位圆第一象限面积 = π/4。换元 x=sin t 也直接得 π/4。定积分几何意义是速算神器。"
+        },
+        {
+          "type": "choice",
+          "question": "∫₋₁¹ (x³ + x⁵cos x) dx = ？",
+          "options": ["2∫₀¹ x³ dx", "0", "无法计算", "∫₋₁¹ x³ dx"],
+          "answer": 1,
+          "explanation": "x³ 与 x⁵cos x 都是奇函数（奇×偶=奇），对称区间积分均为 0。先看奇偶再计算。"
+        },
+        {
+          "type": "choice",
+          "question": "积分中值定理：f 连续，则存在 ξ ∈ [a,b] 使？",
+          "options": ["∫ₐᵇ f = f(ξ)(b-a)", "∫ₐᵇ f = f'(ξ)(b-a)", "f(b)-f(a) = f'(ξ)(b-a)", "∫ₐᵇ f = 0"],
+          "answer": 0,
+          "explanation": "积分中值定理：∫ₐᵇ f(x)dx = f(ξ)(b-a)。C 是拉格朗日中值定理。两者的区别：一个是积分值等于某点函数值×区间长，一个是函数增量等于某点导数×区间长。"
+        },
+        {
+          "type": "choice",
+          "question": "f 以 T 为周期且连续，则 ∫ₐ^(a+T) f(x)dx 的值？",
+          "options": ["与 a 有关", "恒等于 ∫₀ᵀ f(x)dx，与 a 无关", "等于 0", "等于 T·f(a)"],
+          "answer": 1,
+          "explanation": "周期函数在任意长度为一个周期的区间上积分相等，与起点 a 无关。这是周期函数积分的核心性质。"
+        },
+        {
+          "type": "choice",
+          "question": "∫₀¹ xeˣ dx = ？",
+          "options": ["1", "e-1", "e", "e-2"],
+          "answer": 0,
+          "explanation": "分部积分：[xeˣ]₀¹ - ∫₀¹eˣdx = e - (e-1) = 1。注意 uv 整体代端点值。"
+        },
+        {
+          "type": "choice",
+          "question": "f(x) = {x, 0≤x≤1; 2-x, 1<x≤2}，∫₀² f(x)dx = ？",
+          "options": ["1", "3/2", "2", "1/2"],
+          "answer": 0,
+          "explanation": "区间可加性：∫₀¹x dx + ∫₁²(2-x)dx = 1/2 + 1/2 = 1。分段函数定积分必拆区间。几何上是三角形面积 1。"
+        }
+      ]
+    }
+  ]
+}
