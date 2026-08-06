@@ -32,7 +32,15 @@ export async function POST(req: NextRequest) {
     const given = answers[i];
     const correct = given !== undefined && given === q.answer;
     if (correct) {
-      db.prepare("UPDATE mistakes SET status = 'reviewed' WHERE id = ?").run(q.mistake_id);
+      // 答对：复习次数 +1，进入下一个艾宾浩斯间隔
+      db.prepare(
+        "UPDATE mistakes SET status = 'reviewed', review_count = review_count + 1, last_reviewed_at = ? WHERE id = ?"
+      ).run(new Date().toISOString(), q.mistake_id);
+    } else {
+      // 答错：回炉待复习，间隔重新计（从 1 天开始）
+      db.prepare(
+        "UPDATE mistakes SET status = 'pending', review_count = 0, last_reviewed_at = ? WHERE id = ?"
+      ).run(new Date().toISOString(), q.mistake_id);
     }
     return {
       mistake_id: q.mistake_id,

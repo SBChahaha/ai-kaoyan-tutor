@@ -15,6 +15,9 @@ type Mistake = {
   ai_analysis: string;
   status: string;
   created_at: string;
+  options?: string;
+  review_count?: number;
+  last_reviewed_at?: string | null;
 };
 
 const SUBJECTS = ["数据结构", "操作系统", "计算机组成原理", "计算机网络", "数学一", "英语一", "政治"];
@@ -130,6 +133,14 @@ export default function MistakesPage() {
   function overdueDays(createdAt: string): number {
     const d = (Date.now() - new Date(createdAt).getTime()) / 86400000;
     return Math.max(0, Math.floor(d - 3));
+  }
+
+  // 艾宾浩斯下次复习日期（与后端 reviewInterval 一致：1/3/7/15/30 天）
+  function nextDue(m: { review_count?: number; last_reviewed_at?: string | null; created_at: string }): Date {
+    const intervals = [1, 3, 7, 15, 30];
+    const n = Math.min(m.review_count ?? 0, intervals.length - 1);
+    const base = m.last_reviewed_at ? new Date(m.last_reviewed_at) : new Date(m.created_at);
+    return new Date(base.getTime() + intervals[n] * 86400000);
   }
   const overdueCount = list.filter(
     (m) => m.status === "pending" && overdueDays(m.created_at) > 0
@@ -364,7 +375,18 @@ export default function MistakesPage() {
               </span>
               {m.status === "pending" && overdueDays(m.created_at) > 0 && (
                 <span className="rounded bg-red-100 px-2 py-0.5 font-semibold text-red-600">
-                  ⏰ 已逾期 {overdueDays(m.created_at)} 天
+                  ⏰ 逾期 {overdueDays(m.created_at)} 天
+                </span>
+              )}
+              {m.status === "reviewed" && (
+                <span
+                  className={`rounded px-2 py-0.5 ${
+                    nextDue(m).getTime() <= Date.now() ? "bg-red-100 font-semibold text-red-600" : "bg-slate-100 text-slate-500"
+                  }`}
+                >
+                  {nextDue(m).getTime() <= Date.now()
+                    ? "🔔 到期该复习了"
+                    : `下次复习 ${nextDue(m).toISOString().slice(0, 10)}（第 ${Math.min((m.review_count ?? 0) + 1, 5)} 轮）`}
                 </span>
               )}
               <span className="text-slate-400">{m.created_at.slice(0, 10)}</span>

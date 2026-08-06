@@ -18,13 +18,40 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
+// 艾宾浩斯复习间隔（按复习次数递增）：首次错 1 天后 → 3 天 → 7 天 → 15 天 → 30 天
+export function reviewInterval(reviewCount: number): number {
+  const intervals = [1, 3, 7, 15, 30];
+  return intervals[Math.min(reviewCount, intervals.length - 1)];
+}
+
+// 到期时间（下次应复习的时间戳）
+export function nextDueAt(m: {
+  review_count?: number;
+  last_reviewed_at?: string | null;
+  created_at: string;
+}): number {
+  const base = m.last_reviewed_at ? new Date(m.last_reviewed_at).getTime() : new Date(m.created_at).getTime();
+  return base + reviewInterval(m.review_count ?? 0) * 86400000;
+}
+
 export function buildReviewQuestions(limit = 8): ReviewQuestion[] {
-  const rows = db
-    .prepare("SELECT * FROM mistakes WHERE status = 'pending' ORDER BY created_at ASC LIMIT ?")
-    .all(limit) as unknown as Mistake[];
+  // 待复习 + 已到期的已复习错题（艾宾浩斯到期重激活）
+  const rows = db.prepare("SELECT * FROM mistakes LIMIT 500").all() as unknown as Mistake[];
+  const now = Date.now();
+  const due = rows.filter(
+    (m) => m.status === "pending" || (m.status === "reviewed" && nextDueAt(m) <= now)
+  );
+  // 到期优先：已到复习时间的排前（最久未复习的在前），其余按错题时间
+  due.sort((a, b) => {
+    const aDue = nextDueAt(a) <= now ? 0 : 1;
+    const bDue = nextDueAt(b) <= now ? 0 : 1;
+    if (aDue !== bDue) return aDue - bDue;
+    return nextDueAt(a) - nextDueAt(b);
+  });
+  const picked = due.slice(0, limit);
   const out: ReviewQuestion[] = [];
 
-  for (const m of rows) {
+  for (const m of picked) {
     // 优先使用原题选项（闯关自动入库的错题带 options）
     let usedOriginal = false;
     if (m.options) {

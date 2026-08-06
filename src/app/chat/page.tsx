@@ -3,6 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.min.css";
 
 type Msg = { role: "user" | "assistant"; content: string };
 type Note = { id: number; subject: string; chapter: string };
@@ -16,6 +19,29 @@ export default function ChatPage() {
   const [streamingIdx, setStreamingIdx] = useState<number | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const restoredRef = useRef(false);
+
+  // 会话持久化：刷新恢复历史对话
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem("chat_history") ?? "[]");
+      if (Array.isArray(saved) && saved.length > 0 && saved.every((m) => m && m.role && typeof m.content === "string")) {
+        setMessages(saved.slice(-20));
+      }
+    } catch {
+      /* ignore */
+    }
+    restoredRef.current = true;
+  }, []);
+
+  useEffect(() => {
+    if (!restoredRef.current) return;
+    try {
+      localStorage.setItem("chat_history", JSON.stringify(messages.slice(-20)));
+    } catch {
+      /* ignore */
+    }
+  }, [messages]);
 
   useEffect(() => {
     fetch("/api/notes")
@@ -91,6 +117,11 @@ export default function ChatPage() {
   function clearChat() {
     setMessages([]);
     setInput("");
+    try {
+      localStorage.removeItem("chat_history");
+    } catch {
+      /* ignore */
+    }
   }
 
   return (
@@ -153,7 +184,9 @@ export default function ChatPage() {
             >
               {m.role === "assistant" ? (
                 <div className="prose prose-sm prose-slate max-w-none">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{m.content}</ReactMarkdown>
+                  <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
+                    {m.content}
+                  </ReactMarkdown>
                 </div>
               ) : (
                 m.content

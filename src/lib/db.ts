@@ -97,6 +97,13 @@ if (!g.__db) {
   if (!cols.includes("options")) {
     g.__db.exec("ALTER TABLE mistakes ADD COLUMN options TEXT NOT NULL DEFAULT ''");
   }
+  // 艾宾浩斯复习调度：复习次数 + 上次复习时间
+  if (!cols.includes("review_count")) {
+    g.__db.exec("ALTER TABLE mistakes ADD COLUMN review_count INTEGER NOT NULL DEFAULT 0");
+  }
+  if (!cols.includes("last_reviewed_at")) {
+    g.__db.exec("ALTER TABLE mistakes ADD COLUMN last_reviewed_at TEXT");
+  }
   // 迁移：进度表补充难点标记列
   const pcols = (g.__db.prepare("PRAGMA table_info(progress)").all() as { name: string }[]).map(
     (c) => c.name
@@ -128,6 +135,8 @@ export type Mistake = {
   status: string;
   created_at: string;
   options: string;
+  review_count?: number;
+  last_reviewed_at?: string | null;
 };
 
 export function getSetting(key: string, fallback: string): string {
