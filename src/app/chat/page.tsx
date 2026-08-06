@@ -13,6 +13,8 @@ export default function ChatPage() {
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<Msg[]>([]);
   const [busy, setBusy] = useState(false);
+  const [streamingIdx, setStreamingIdx] = useState<number | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -39,19 +41,47 @@ export default function ChatPage() {
     setMessages((m) => [...m, { role: "user", content: text }]);
     setInput("");
     setBusy(true);
+    const aiIdx = messages.length + 1; // 新 assistant 消息的索引（用户消息已 push 后）
+    setMessages((m) => [...m, { role: "assistant", content: "" }]);
+    setStreamingIdx(aiIdx);
+    const controller = new AbortController();
+    abortRef.current = controller;
     try {
-      const r = await fetch("/api/chat", {
+      const r = await fetch("/api/chat/stream", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question: text, noteId: noteId || undefined }),
+        signal: controller.signal,
       });
-      const data = await r.json();
-      setMessages((m) => [...m, { role: "assistant", content: data.answer ?? data.error ?? "出错了" }]);
-    } catch {
-      setMessages((m) => [...m, { role: "assistant", content: "⚠️ 网络错误，请重试" }]);
+      if (!r.ok || !r.body) {
+        const err = await r.text().catch(() => "");
+        setMessages((m) => m.map((x, i) => (i === aiIdx ? { ...x, content: err || "⚠️ 请求失败" } : x)));
+        return;
+      }
+      const reader = r.body.getReader();
+      const decoder = new TextDecoder();
+      let acc = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        acc += decoder.decode(value, { stream: true });
+        setMessages((m) => m.map((x, i) => (i === aiIdx ? { ...x, content: acc } : x)));
+      }
+    } catch (e) {
+      if ((e as Error).name === "AbortError") {
+        setMessages((m) => m.map((x, i) => (i === aiIdx ? { ...x, content: x.content + "\n\n（已停止生成）" } : x)));
+      } else {
+        setMessages((m) => m.map((x, i) => (i === aiIdx && !x.content ? { ...x, content: "⚠️ 网络错误，请重试" } : x)));
+      }
     } finally {
       setBusy(false);
+      setStreamingIdx(null);
+      abortRef.current = null;
     }
+  }
+
+  function stop() {
+    abortRef.current?.abort();
   }
 
   return (
@@ -100,10 +130,10 @@ export default function ChatPage() {
             </div>
           </div>
         ))}
-        {busy && (
+        {busy && streamingIdx !== null && (
           <div className="flex justify-start">
             <div className="rounded-2xl rounded-bl-sm bg-slate-100 px-4 py-2.5 text-sm text-slate-500">
-              思考中…
+              <span className="inline-block animate-pulse">▊</span> 生成中…
             </div>
           </div>
         )}
@@ -118,13 +148,22 @@ export default function ChatPage() {
           placeholder="输入问题，Enter 发送"
           className="flex-1 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm outline-none focus:border-blue-400"
         />
-        <button
-          onClick={send}
-          disabled={busy}
-          className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
-        >
-          发送
-        </button>
+        {busy ? (
+          <button
+            onClick={stop}
+            className="rounded-xl bg-red-600 px-5 py-2.5 text-sm text-white hover:bg-red-700"
+          >
+            ⏹ 停止
+          </button>
+        ) : (
+          <button
+            onClick={send}
+            disabled={busy}
+            className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
+          >
+            发送
+          </button>
+        )}
       </div>
     </div>
   );
