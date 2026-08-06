@@ -41,6 +41,27 @@ export default function TodayPlans() {
     setPlans(plans.map((x) => (x.id === p.id ? { ...x, done: x.done ? 0 : 1 } : x)));
   }
 
+  async function completeAll() {
+    await Promise.all(
+      plans
+        .filter((p) => !p.done)
+        .map((p) =>
+          fetch(`/api/plans/${p.id}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ done: true }),
+          })
+        )
+    );
+    setPlans(plans.map((p) => ({ ...p, done: 1 })));
+  }
+
+  async function loadDate(date: string) {
+    setToday(date);
+    const r = await fetch(`/api/plans?date=${date}`);
+    setPlans(await r.json());
+  }
+
   const doneCount = plans.filter((p) => p.done).length;
 
   return (
@@ -50,6 +71,31 @@ export default function TodayPlans() {
         <span className="text-sm text-slate-500">
           {doneCount}/{plans.length} 完成
         </span>
+      </div>
+      <div className="mb-2 flex items-center gap-2">
+        <input
+          type="date"
+          value={today}
+          onChange={(e) => e.target.value && loadDate(e.target.value)}
+          className="rounded border border-slate-300 px-2 py-1 text-xs"
+          title="查看任意日期的清单"
+        />
+        {plans.length > 0 && doneCount < plans.length && (
+          <button
+            onClick={completeAll}
+            className="rounded-lg bg-green-600 px-3 py-1 text-xs font-semibold text-white hover:bg-green-700"
+          >
+            ✅ 一键全完成
+          </button>
+        )}
+        {today !== new Date().toISOString().slice(0, 10).replace("T", " ") && (
+          <button
+            onClick={() => loadDate(new Date().toISOString().slice(0, 10))}
+            className="rounded-lg border border-slate-300 px-3 py-1 text-xs text-slate-500 hover:bg-slate-50"
+          >
+            回到今天
+          </button>
+        )}
       </div>
       <ul className="mb-3 space-y-1.5">
         {plans.map((p) => (

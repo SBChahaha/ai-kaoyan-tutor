@@ -110,9 +110,26 @@ export default function CourseIndexClient({
           <div className="space-y-4 rounded-b-2xl border border-t-0 border-slate-200 bg-white p-4">
             {s.chapters.map((c) => {
               const boss = bosses[c.chapter];
+              const chQuiz = c.lessons.filter((l) => levels[l.slug]?.hasQuiz);
+              const chPassed = chQuiz.filter((l) => levels[l.slug]?.passed).length;
               return (
                 <div key={c.chapter}>
-                  <h3 className="mb-1.5 text-sm font-semibold text-slate-700">{c.chapter}</h3>
+                  <div className="mb-1.5 flex items-center justify-between">
+                    <h3 className="text-sm font-semibold text-slate-700">{c.chapter}</h3>
+                    {chQuiz.length > 0 && (
+                      <span className="text-xs text-slate-400">
+                        {chPassed}/{chQuiz.length} 关
+                      </span>
+                    )}
+                  </div>
+                  {chQuiz.length > 0 && (
+                    <div className="mb-2 h-1 overflow-hidden rounded-full bg-slate-100">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-amber-400 to-orange-500"
+                        style={{ width: `${(chPassed / chQuiz.length) * 100}%` }}
+                      />
+                    </div>
+                  )}
                   <ul className="grid gap-1.5 sm:grid-cols-2">
                     {c.lessons
                       .filter((l) => !hidePassed || !levels[l.slug]?.passed)

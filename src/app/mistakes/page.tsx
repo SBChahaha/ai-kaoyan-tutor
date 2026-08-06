@@ -36,6 +36,7 @@ export default function MistakesPage() {
   const [aiId, setAiId] = useState<number | null>(null);
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [search, setSearch] = useState("");
+  const [sortMode, setSortMode] = useState<"overdue" | "newest">("overdue");
 
   async function load() {
     const r = await fetch("/api/mistakes");
@@ -103,9 +104,17 @@ export default function MistakesPage() {
   }
 
   const shown = filter ? list.filter((m) => m.subject === filter) : list;
+  // 排序：逾期优先（待复习按时间最久在前，其余按最新在前）
+  const sorted = [...shown].sort((a, b) => {
+    if (sortMode === "overdue") {
+      if (a.status !== b.status) return a.status === "pending" ? -1 : 1;
+      if (a.status === "pending") return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+    }
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+  });
   const kw = search.trim().toLowerCase();
-  const shownFiltered = kw
-    ? shown.filter(
+  const shownFiltered = (kw
+    ? sorted.filter(
         (m) =>
           m.question.toLowerCase().includes(kw) ||
           (m.right_answer ?? "").toLowerCase().includes(kw) ||
@@ -113,7 +122,8 @@ export default function MistakesPage() {
           (m.wrong_reason ?? "").toLowerCase().includes(kw) ||
           (m.chapter ?? "").toLowerCase().includes(kw)
       )
-    : shown;
+    : sorted
+  );
   const pendingCount = list.filter((m) => m.status === "pending").length;
 
   // 逾期天数（待复习超过 3 天）
@@ -306,8 +316,17 @@ export default function MistakesPage() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="🔍 搜题目/答案/原因…"
-          className="ml-auto w-48 rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-400 focus:outline-none"
+          className="w-48 rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-400 focus:outline-none"
         />
+        <button
+          onClick={() => setSortMode((s) => (s === "overdue" ? "newest" : "overdue"))}
+          className={`rounded-full px-3 py-1 text-xs font-semibold ${
+            sortMode === "overdue" ? "bg-orange-100 text-orange-700" : "bg-slate-200 text-slate-600"
+          }`}
+          title="切换排序方式"
+        >
+          {sortMode === "overdue" ? "⏰ 逾期优先" : "🕒 最新在前"}
+        </button>
       </div>
 
       {/* 错题列表 */}
