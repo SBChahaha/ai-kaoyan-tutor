@@ -43,15 +43,17 @@
           "explanation": "C 正确：f(ax+b) 中自变量增加 T/|a| 时，ax+b 增加 ±T，函数值复原。A 错：sin x + cos(πx) 无周期。B 错：sin 2x 周期为 π。D 错：常数函数没有最小正周期。"
         },
         {
-          "type": "fill",
-          "question": "f(x) = sin x / (1 + x²) 是____函数（填：奇 / 偶）",
-          "answer": ["奇"],
-          "explanation": "定义域 R 关于原点对称；f(-x) = sin(-x)/(1+(-x)²) = -sin x/(1+x²) = -f(x)。"
+          "type": "choice",
+          "question": "f(x) = sin x / (1 + x²) 的奇偶性是？",
+          "options": ["奇函数", "偶函数", "非奇非偶函数", "既奇又偶函数"],
+          "answer": 0,
+          "explanation": "定义域 R 关于原点对称；f(-x) = sin(-x)/(1+(-x)²) = -sin x/(1+x²) = -f(x)，故为奇函数。"
         },
         {
-          "type": "fill",
-          "question": "y = lg x² 的定义域是____（填写：x≠0 或 x>0）",
-          "answer": ["x≠0", "x!=0", "x<>0", "(-∞,0)∪(0,+∞)"],
+          "type": "choice",
+          "question": "y = lg x² 的定义域是？",
+          "options": ["{x | x≠0}", "{x | x>0}", "{x | x≥0}", "全体实数 R"],
+          "answer": 0,
           "explanation": "x² > 0 对一切 x≠0 成立，故定义域为 {x | x≠0}。而 y = 2lg x 要求 x>0——这就是两者不是同一函数的原因。"
         }
       ]
@@ -92,16 +94,18 @@
           "explanation": "由'f 以 T 为周期 ⟹ f(ax+b) 以 T/|a| 为周期'：sin x 周期 2π，故 sin 2x 周期 = 2π/2 = π。"
         },
         {
-          "type": "fill",
-          "question": "f(x) = x³ 是____函数（填：奇 / 偶）",
-          "answer": ["奇"],
+          "type": "choice",
+          "question": "f(x) = x³ 的奇偶性是？",
+          "options": ["奇函数", "偶函数", "非奇非偶函数", "既奇又偶函数"],
+          "answer": 0,
           "explanation": "f(-x) = (-x)³ = -x³ = -f(x)，且定义域 R 对称，故为奇函数。"
         },
         {
-          "type": "fill",
-          "question": "y = ln(x² - 3x + 2) 的定义域是____（填写：x<1或x>2 或 (-∞,1)∪(2,+∞)）",
-          "answer": ["x<1或x>2", "x<1或x>2", "(-∞,1)∪(2,+∞)", "x<1orx>2", "x<1 or x>2"],
-          "explanation": "真数 x²-3x+2 = (x-1)(x-2) > 0，解得 x<1 或 x>2。"
+          "type": "choice",
+          "question": "y = ln(x² - 3x + 2) 的定义域是？",
+          "options": ["(-∞,1) ∪ (2,+∞)", "(1,2)", "(-∞,2)", "全体实数 R"],
+          "answer": 0,
+          "explanation": "真数 x²-3x+2 = (x-1)(x-2) > 0，解得 x<1 或 x>2，即 (-∞,1)∪(2,+∞)。"
         }
       ]
     }

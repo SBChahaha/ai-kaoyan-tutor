@@ -49,8 +49,29 @@ export default function HomeworkWidget({
   const [items, setItems] = useState<HomeworkItem[]>(initialItems);
   const [drafts, setDrafts] = useState<Record<number, string>>({});
   const [busy, setBusy] = useState<Record<number, boolean>>({});
+  const [open, setOpen] = useState(false);
 
   if (questions.length === 0) return null;
+
+  // 默认折叠：不想打字就完全不用管它（选做）
+  if (!open) {
+    return (
+      <div className="mt-6">
+        <button
+          onClick={() => setOpen(true)}
+          className="flex w-full items-center justify-between rounded-2xl border border-dashed border-blue-200 bg-blue-50/40 px-5 py-3.5 text-sm font-semibold text-blue-700 hover:bg-blue-50"
+        >
+          <span>
+            📝 作业提交（AI 批改，选做）
+            <span className="ml-2 font-normal text-blue-500">
+              {items.length}/{questions.length} 已交
+            </span>
+          </span>
+          <span className="text-blue-400">展开 →</span>
+        </button>
+      </div>
+    );
+  }
 
   async function submit(qi: number) {
     const answer = (drafts[qi] ?? "").trim();
