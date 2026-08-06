@@ -124,11 +124,22 @@ export default function ChatPage() {
 
       <div className="flex-1 space-y-3 overflow-y-auto rounded-xl border border-slate-200 bg-white p-4">
         {messages.length === 0 && (
-          <div className="pt-10 text-center text-sm text-slate-400">
+          <div className="pt-8 text-center text-sm text-slate-400">
             <p className="mb-2 text-3xl">🦉</p>
             <p>我是 AI 考研助教，面向 11408 备考</p>
             <p className="mt-1">可以问：概念讲解 / 真题解析 / 错题分析 / 复习规划</p>
             <p className="mt-3 text-xs">提示：选好"章节上下文"后提问，回答会结合你的笔记</p>
+            <div className="mx-auto mt-4 flex max-w-md flex-wrap justify-center gap-1.5">
+              {["等价无穷小有哪些？", "怎么证明单调有界？", "洛必达什么时候失效？", "定积分怎么算？"].map((s) => (
+                <button
+                  key={s}
+                  onClick={() => doAsk(s)}
+                  className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs text-blue-600 transition hover:bg-blue-100"
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
           </div>
         )}
         {messages.map((m, i) => (

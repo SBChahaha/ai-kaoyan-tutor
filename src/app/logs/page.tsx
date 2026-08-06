@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import CalendarView from "./CalendarView";
 
 type Log = {
   id: number;
@@ -28,6 +29,7 @@ export default function LogsPage() {
     total_hours: number;
     last_30_days: { date: string; hours: number }[];
   } | null>(null);
+  const [pickDate, setPickDate] = useState("");
 
   async function load() {
     const r = await fetch("/api/logs");
@@ -87,6 +89,47 @@ export default function LogsPage() {
             <span>{chart.last_30_days[0]?.date}</span>
             <span>今天</span>
           </div>
+        </div>
+      )}
+
+      {/* 月历视图 */}
+      {chart && (
+        <CalendarView
+          days={chart.last_30_days}
+          logs={list}
+          onPick={(d) => {
+            setPickDate(d);
+            setDate(d);
+          }}
+        />
+      )}
+
+      {/* 选中日期的记录 */}
+      {pickDate && (
+        <div className="rounded-xl border border-slate-200 bg-white p-4">
+          <div className="mb-2 flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-slate-700">📋 {pickDate} 的记录</h3>
+            <button
+              onClick={() => setPickDate("")}
+              className="rounded-lg border border-slate-300 px-2 py-1 text-xs text-slate-500 hover:bg-slate-50"
+            >
+              关闭
+            </button>
+          </div>
+          {list.filter((l) => l.date.slice(0, 10) === pickDate).length === 0 ? (
+            <p className="text-sm text-slate-400">这天没有记录</p>
+          ) : (
+            <ul className="space-y-2 text-sm">
+              {list
+                .filter((l) => l.date.slice(0, 10) === pickDate)
+                .map((l) => (
+                  <li key={l.id} className="rounded-lg bg-slate-50 p-2.5">
+                    <span className="font-semibold text-blue-600">{l.hours}h</span>
+                    <span className="ml-2 text-slate-700">{l.content || "（无内容）"}</span>
+                  </li>
+                ))}
+            </ul>
+          )}
         </div>
       )}
 

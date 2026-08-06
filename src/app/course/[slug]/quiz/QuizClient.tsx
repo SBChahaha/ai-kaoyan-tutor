@@ -262,6 +262,12 @@ export default function QuizClient({
                   <p className="mt-2 rounded-lg bg-slate-50 p-2.5 text-slate-600">
                     {r.explanation}
                   </p>
+                  <a
+                    href={`/course/${encodeURIComponent(lessonSlug)}`}
+                    className="mt-1.5 inline-block text-xs text-blue-600 hover:underline"
+                  >
+                    📖 回讲义复习对应知识点 →
+                  </a>
                 </div>
               </div>
             </div>

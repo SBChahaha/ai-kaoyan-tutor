@@ -3,20 +3,30 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-// 🤔 首页快速提问：直接进入 AI 答疑
+// 🤔 首页快速提问：直接进入 AI 答疑（含常见问题快捷入口）
+const SUGGESTIONS = [
+  "等价无穷小有哪些？",
+  "怎么证明函数单调有界？",
+  "泰勒公式怎么展开？",
+  "积分换元法怎么用？",
+];
+
 export default function QuickAsk() {
   const [q, setQ] = useState("");
   const router = useRouter();
 
-  function go(e: React.FormEvent) {
-    e.preventDefault();
-    if (!q.trim()) return;
-    router.push(`/chat?q=${encodeURIComponent(q.trim())}`);
+  function go(text?: string) {
+    const t = (text ?? q).trim();
+    if (!t) return;
+    router.push(`/chat?q=${encodeURIComponent(t)}`);
   }
 
   return (
     <form
-      onSubmit={go}
+      onSubmit={(e) => {
+        e.preventDefault();
+        go();
+      }}
       className="rounded-2xl border border-slate-200 bg-white p-4"
     >
       <div className="mb-2 text-sm font-semibold text-slate-700">🤔 有问题，现在就想问？</div>
@@ -34,6 +44,20 @@ export default function QuickAsk() {
           提问
         </button>
       </div>
+      {!q && (
+        <div className="mt-2.5 flex flex-wrap gap-1.5">
+          {SUGGESTIONS.map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => go(s)}
+              className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs text-blue-600 transition hover:bg-blue-100"
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+      )}
     </form>
   );
 }
