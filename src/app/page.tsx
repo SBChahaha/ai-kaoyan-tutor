@@ -3,6 +3,7 @@ import { db, todayStr } from "@/lib/db";
 import { EXAM_DATE } from "@/lib/config";
 import { listLessons } from "@/lib/course";
 import TodayPlans from "./components/TodayPlans";
+import TodayStats from "./components/TodayStats";
 
 export const dynamic = "force-dynamic";
 
@@ -94,9 +95,12 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* 今日计划 */}
-      <div className="rounded-xl border border-slate-200 bg-white p-5">
-        <TodayPlans />
+      {/* 今日计划 + 学习统计 */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <div className="rounded-xl border border-slate-200 bg-white p-5">
+          <TodayPlans />
+        </div>
+        <TodayStats />
       </div>
     </div>
   );

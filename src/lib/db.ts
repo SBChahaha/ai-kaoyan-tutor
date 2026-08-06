@@ -73,11 +73,23 @@ if (!g.__db) {
       answers TEXT NOT NULL DEFAULT '{}',
       created_at TEXT NOT NULL
     );
+    CREATE TABLE IF NOT EXISTS settings (
+      key TEXT PRIMARY KEY,
+      value TEXT NOT NULL
+    );
     CREATE INDEX IF NOT EXISTS idx_notes_subject ON notes(subject);
     CREATE INDEX IF NOT EXISTS idx_mistakes_subject ON mistakes(subject);
     CREATE INDEX IF NOT EXISTS idx_logs_date ON logs(date);
     CREATE INDEX IF NOT EXISTS idx_plans_date ON plans(date);
+    CREATE INDEX IF NOT EXISTS idx_quiz_attempts_slug ON quiz_attempts(lesson_slug);
   `);
+  // 迁移：为错题表补充 options 列（存原始选项，供复习测试用）
+  const cols = (g.__db.prepare("PRAGMA table_info(mistakes)").all() as { name: string }[]).map(
+    (c) => c.name
+  );
+  if (!cols.includes("options")) {
+    g.__db.exec("ALTER TABLE mistakes ADD COLUMN options TEXT NOT NULL DEFAULT ''");
+  }
 }
 export const db = g.__db;
 
@@ -101,7 +113,22 @@ export type Mistake = {
   ai_analysis: string;
   status: string;
   created_at: string;
+  options: string;
 };
+
+export function getSetting(key: string, fallback: string): string {
+  const r = db.prepare("SELECT value FROM settings WHERE key = ?").get(key) as
+    | { value: string }
+    | undefined;
+  return r?.value ?? fallback;
+}
+
+export function setSetting(key: string, value: string) {
+  db.prepare(
+    `INSERT INTO settings (key, value) VALUES (?, ?)
+     ON CONFLICT(key) DO UPDATE SET value = excluded.value`
+  ).run(key, value);
+}
 
 export function getNotes(subject?: string): Note[] {
   if (subject) {

@@ -23,10 +23,17 @@ export default function LogsPage() {
   const [hours, setHours] = useState("8");
   const [content, setContent] = useState("");
   const [plan, setPlan] = useState("");
+  const [chart, setChart] = useState<{
+    streak: number;
+    total_hours: number;
+    last_30_days: { date: string; hours: number }[];
+  } | null>(null);
 
   async function load() {
     const r = await fetch("/api/logs");
     setList(await r.json());
+    const s = await (await fetch("/api/stats")).json();
+    setChart(s);
   }
   useEffect(() => {
     load();
@@ -46,6 +53,7 @@ export default function LogsPage() {
   }
 
   const total = list.reduce((s, l) => s + l.hours, 0);
+  const maxH = chart ? Math.max(1, ...chart.last_30_days.map((d) => d.hours)) : 1;
 
   return (
     <div className="mx-auto max-w-2xl space-y-5">
@@ -53,8 +61,34 @@ export default function LogsPage() {
         <h1 className="text-xl font-bold">📝 学习日志</h1>
         <span className="text-sm text-slate-500">
           累计 <b className="text-blue-600">{total}</b> 小时
+          {chart && (
+            <span className="ml-2 rounded-full bg-orange-100 px-2 py-0.5 text-xs text-orange-600">
+              🔥 连续 {chart.streak} 天
+            </span>
+          )}
         </span>
       </div>
+
+      {/* 30 天趋势 */}
+      {chart && (
+        <div className="rounded-xl border border-slate-200 bg-white p-4">
+          <div className="mb-2 text-xs text-slate-400">近 30 天学习时长（h）</div>
+          <div className="flex items-end gap-[3px]">
+            {chart.last_30_days.map((d) => (
+              <div
+                key={d.date}
+                title={`${d.date}: ${d.hours}h`}
+                className={`flex-1 rounded-t ${d.hours > 0 ? "bg-blue-500" : "bg-slate-100"}`}
+                style={{ height: `${Math.max(3, (d.hours / maxH) * 80)}px` }}
+              />
+            ))}
+          </div>
+          <div className="mt-1 flex justify-between text-[10px] text-slate-400">
+            <span>{chart.last_30_days[0]?.date}</span>
+            <span>今天</span>
+          </div>
+        </div>
+      )}
 
       <div className="rounded-xl border border-slate-200 bg-white p-4">
         <div className="mb-2 flex gap-2">

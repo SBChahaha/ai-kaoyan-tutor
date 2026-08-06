@@ -168,8 +168,8 @@ export async function POST(req: NextRequest, ctx: Ctx) {
   const chapter = lesson?.meta.chapter ?? "";
   const findMistake = db.prepare("SELECT id FROM mistakes WHERE question = ?");
   const addMistake = db.prepare(
-    `INSERT INTO mistakes (subject, chapter, question, my_answer, right_answer, wrong_reason, ai_analysis, status, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?)`
+    `INSERT INTO mistakes (subject, chapter, question, my_answer, right_answer, wrong_reason, ai_analysis, status, options, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)`
   );
   for (const res of results) {
     const guessed =
@@ -190,6 +190,11 @@ export async function POST(req: NextRequest, ctx: Ctx) {
       res.correct_answer,
       guessed ? "闯关答对但解释不过关（疑似蒙对）" : "闯关测试答错",
       res.explanation,
+      res.type === "choice"
+        ? JSON.stringify(
+            (questions[res.index] as Extract<QuizQuestion, { type: "choice" }>).options
+          )
+        : "",
       new Date().toISOString()
     );
   }

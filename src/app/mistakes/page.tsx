@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import ReviewClient from "./ReviewClient";
 
 type Mistake = {
   id: number;
@@ -117,6 +118,16 @@ export default function MistakesPage() {
           也可以在聊天里说"整理错题"并贴出题目，AI 会帮你录入。
         </span>
       </div>
+
+      {/* 复习模式 */}
+      {pendingCount > 0 && (
+        <ReviewClient
+          onDone={() => {
+            load();
+            setFilter("");
+          }}
+        />
+      )}
 
       {/* 添加错题表单 */}
       <div className="rounded-xl border border-slate-200 bg-white p-4">
