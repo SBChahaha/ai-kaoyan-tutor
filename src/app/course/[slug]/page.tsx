@@ -65,6 +65,13 @@ export default async function LessonPage({
         </div>
       </div>
 
+      {/* 📖 课程讲解（讲义） */}
+      <div className="mb-4 flex items-center gap-3">
+        <span className="rounded-lg bg-blue-600 px-3 py-1 text-sm font-bold text-white">
+          📖 课程讲解
+        </span>
+        <span className="text-sm text-slate-500">本课全部知识点的完整讲解与证明</span>
+      </div>
       <LessonViewer
         slug={lesson.meta.slug}
         content={lesson.content}
@@ -72,6 +79,13 @@ export default async function LessonPage({
         next={next ? { slug: next.slug, title: next.title, subject: next.subject } : null}
         initialDone={initialDone}
       />
+
+      {/* 过渡分隔 */}
+      <div className="my-8 flex items-center gap-3">
+        <div className="h-px flex-1 bg-slate-200" />
+        <span className="text-xs text-slate-400">📚 讲义结束 · 完成下方测试即可过关</span>
+        <div className="h-px flex-1 bg-slate-200" />
+      </div>
 
       {/* 内嵌过关测试（纯选择题） */}
       {quiz && level?.hasQuiz && level.unlocked && (

@@ -89,11 +89,7 @@ export default function CourseIndexClient({
                           </span>
                         ) : (
                           <Link
-                            href={
-                              isQuiz && !passed
-                                ? `/course/${encodeURIComponent(l.slug)}/quiz`
-                                : `/course/${encodeURIComponent(l.slug)}`
-                            }
+                            href={`/course/${encodeURIComponent(l.slug)}`}
                             className="flex-1 truncate text-sm text-slate-700 hover:text-blue-700"
                           >
                             {l.title}
@@ -109,7 +105,7 @@ export default function CourseIndexClient({
                         )}
                         {isQuiz && !passed && !locked && (
                           <span className="shrink-0 text-xs font-semibold text-blue-600">
-                            挑战 →
+                            学习 →
                           </span>
                         )}
                       </li>

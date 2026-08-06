@@ -11,7 +11,6 @@ export const metadata: Metadata = {
 const NAV = [
   { href: "/", label: "首页" },
   { href: "/course", label: "课程" },
-  { href: "/notes", label: "知识库" },
   { href: "/chat", label: "AI 答疑" },
   { href: "/mistakes", label: "错题本" },
   { href: "/logs", label: "日志" },
