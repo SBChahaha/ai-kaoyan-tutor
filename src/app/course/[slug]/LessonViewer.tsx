@@ -151,6 +151,9 @@ export default function LessonViewer({
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // 📑 移动端目录：React state 控制（不依赖浏览器 details 行为）
+  const [tocOpen, setTocOpen] = useState(false);
+
   return (
     <div className="flex gap-8">
       {/* 阅读进度条 */}
@@ -166,25 +169,30 @@ export default function LessonViewer({
         <div className="no-print mb-3 flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-1.5">
             {toc.length > 0 && (
-              <details className="xl:hidden">
-                <summary className="cursor-pointer rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-semibold text-slate-600 hover:bg-slate-50">
-                  📑 目录
-                </summary>
-                <div className="absolute z-20 mt-2 w-64 rounded-xl border border-slate-200 bg-white p-3 shadow-lg">
-                  <ul className="max-h-80 space-y-1 overflow-y-auto text-sm">
-                    {toc.map((t) => (
-                      <li key={t.id}>
-                        <a
-                          href={`#${t.id}`}
-                          className="block truncate rounded px-2 py-1 text-slate-600 hover:bg-slate-50 hover:text-blue-600"
-                        >
-                          {t.text}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </details>
+              <div className="relative xl:hidden">
+                <button
+                  onClick={() => setTocOpen((o) => !o)}
+                  className="cursor-pointer rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+                >
+                  📑 目录 {tocOpen ? "▾" : "▸"}
+                </button>
+                {tocOpen && (
+                  <div className="mt-2 w-72 rounded-xl border border-slate-200 bg-white p-3 shadow-lg">
+                    <ul className="max-h-80 space-y-1 overflow-y-auto text-sm">
+                      {toc.map((t) => (
+                        <li key={t.id}>
+                          <a
+                            href={`#${t.id}`}
+                            className="block truncate rounded px-2 py-1 text-slate-600 hover:bg-slate-50 hover:text-blue-600"
+                          >
+                            {t.text}
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
             )}
             <button
               onClick={() => setFontScale((s) => Math.max(0.85, +(s - 0.1).toFixed(2)))}

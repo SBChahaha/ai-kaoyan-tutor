@@ -183,7 +183,7 @@ export default function ChatPage() {
               }
             >
               {m.role === "assistant" ? (
-                <div className="prose prose-sm prose-slate max-w-none">
+                <div className="chat-answer prose prose-sm prose-slate max-w-none">
                   <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>
                     {m.content}
                   </ReactMarkdown>

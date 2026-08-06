@@ -15,7 +15,7 @@ export default function MathText({
   className?: string;
 }) {
   return (
-    <div className={className}>
+    <div className={className ? `${className} math-text` : "math-text"}>
       <ReactMarkdown
         remarkPlugins={[remarkGfm, remarkMath]}
         rehypePlugins={[rehypeKatex]}

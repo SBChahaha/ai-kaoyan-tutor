@@ -103,6 +103,34 @@ body {
   font-size: 1.05em;
 }
 
+/* ===== KaTeX 渲染协调（防公式重叠） ===== */
+.prose .katex,
+.math-text .katex,
+.chat-answer .katex {
+  line-height: 1.2;
+}
+.prose p,
+.prose li,
+.prose blockquote,
+.prose td,
+.prose th,
+.math-text p,
+.math-text li,
+.chat-answer p,
+.chat-answer li {
+  line-height: 1.9; /* 行盒加高，容纳分数/极限/求和等行内高公式 */
+}
+.math-text p {
+  margin: 0;
+  display: inline;
+}
+.katex-display {
+  margin: 0.6em 0;
+  padding: 0.25em 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
 /* ===== 夜间阅读（仅讲义区） ===== */
 .lesson-dark .prose {
   color: #cbd5e1;
