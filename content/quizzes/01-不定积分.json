@@ -1,0 +1,98 @@
+{
+  "lesson": "01-不定积分",
+  "pass_percent": 70,
+  "variants": [
+    {
+      "questions": [
+        {
+          "type": "choice",
+          "question": "F(x) 与 G(x) 都是 f(x) 的原函数，则 F(x) - G(x) = ？",
+          "options": ["f(x)", "0", "常数 C", "x + C"],
+          "answer": 2,
+          "explanation": "同一函数的任意两个原函数只差一个常数（拉格朗日推论：差的导数为 0 ⟹ 差为常数）。这是不定积分概念的核心题。"
+        },
+        {
+          "type": "choice",
+          "question": "∫(1/x)dx = ？",
+          "options": ["ln x + C", "ln|x| + C", "1/x² + C", "x·ln x + C"],
+          "answer": 1,
+          "explanation": "(ln|x|)' = 1/x 对 x>0 和 x<0 都成立，必须带绝对值。A 只在 x>0 成立，定义域错误。"
+        },
+        {
+          "type": "choice",
+          "question": "∫ 2x·e^(x²) dx = ？",
+          "options": ["e^(x²) + C", "x²e^(x²) + C", "2e^(x²) + C", "e^(x²)/2 + C"],
+          "answer": 0,
+          "explanation": "凑微分：d(x²) = 2x dx，原式 = ∫e^(x²)d(x²) = e^(x²) + C。验证：(e^(x²))' = 2xe^(x²) ✓。"
+        },
+        {
+          "type": "choice",
+          "question": "∫ x·eˣ dx = ？",
+          "options": ["x²eˣ/2 + C", "xeˣ - eˣ + C", "xeˣ + C", "eˣ + C"],
+          "answer": 1,
+          "explanation": "分部积分：u = x（幂函数优先当 u），dv = eˣdx：xeˣ - ∫eˣdx = xeˣ - eˣ + C。"
+        },
+        {
+          "type": "choice",
+          "question": "∫ ln x dx = ？",
+          "options": ["x ln x - x + C", "x ln x + C", "1/x + C", "ln x · x + x + C"],
+          "answer": 0,
+          "explanation": "分部：u = ln x（对数最优先当 u），dv = dx：x ln x - ∫x·(1/x)dx = x ln x - x + C。"
+        },
+        {
+          "type": "choice",
+          "question": "∫ dx/(1 + 4x²) = ？",
+          "options": ["arctan(2x)/2 + C", "arctan(2x) + C", "arctan x/2 + C", "2arctan(2x) + C"],
+          "answer": 0,
+          "explanation": "凑 arctan：1/(1+(2x)²)，d(2x) = 2dx，原式 = (1/2)∫d(2x)/(1+(2x)²) = arctan(2x)/2 + C。"
+        }
+      ]
+    },
+    {
+      "questions": [
+        {
+          "type": "choice",
+          "question": "(∫f(x)dx)' = ？",
+          "options": ["f(x)", "f'(x)", "∫f'(x)dx", "F(x) + C"],
+          "answer": 0,
+          "explanation": "先积后导还原：对不定积分再求导得到被积函数本身。这是不定积分基本性质。"
+        },
+        {
+          "type": "choice",
+          "question": "∫ dx/√(1-x²) = ？",
+          "options": ["arctan x + C", "arcsin x + C", "ln|√(1-x²)| + C", "1/√(1-x²) + C"],
+          "answer": 1,
+          "explanation": "基本公式：(arcsin x)' = 1/√(1-x²)。这是积分公式表的直接应用。"
+        },
+        {
+          "type": "choice",
+          "question": "∫ sin²x dx = ？",
+          "options": ["x/2 - sin 2x/4 + C", "x/2 + sin 2x/4 + C", "-cos²x + C", "sin²x/2 + C"],
+          "answer": 0,
+          "explanation": "降幂公式 sin²x = (1-cos2x)/2，∫ = x/2 - sin2x/4 + C。验证：求导得 (1-cos2x)/2 ✓。"
+        },
+        {
+          "type": "choice",
+          "question": "∫ tan x dx = ？",
+          "options": ["ln|sec x| + C", "ln|cos x| + C", "sec²x + C", "-ln|cos x| + C"],
+          "answer": 3,
+          "explanation": "∫tan x dx = ∫sin x/cos x dx，凑 d(cos x) = -sin x dx：-∫d(cos x)/cos x = -ln|cos x| + C。注意负号——(ln|cos x|)' = -tan x。"
+        },
+        {
+          "type": "choice",
+          "question": "∫ dx/(x² - 1) = ？",
+          "options": ["(1/2)ln|(x-1)/(x+1)| + C", "ln|x²-1| + C", "arctan x + C", "(1/2)ln|x²-1| + C"],
+          "answer": 0,
+          "explanation": "拆部分分式：1/((x-1)(x+1)) = (1/2)(1/(x-1) - 1/(x+1))，积分得 (1/2)ln|(x-1)/(x+1)| + C。"
+        },
+        {
+          "type": "choice",
+          "question": "∫ e^(√x) dx = ？",
+          "options": ["2(√x - 1)e^(√x) + C", "e^(√x) + C", "2e^(√x) + C", "(√x)e^(√x) + C"],
+          "answer": 0,
+          "explanation": "令 t = √x，dx = 2t dt：2∫te^t dt = 2(t-1)e^t + C = 2(√x-1)e^(√x) + C。根式在指数上先换元再分部。"
+        }
+      ]
+    }
+  ]
+}
