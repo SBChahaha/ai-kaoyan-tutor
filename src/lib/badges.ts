@@ -35,6 +35,12 @@ export function computeBadges(): Badge[] {
     }
   ).c;
   const homework = (db.prepare("SELECT COUNT(*) AS c FROM homework").get() as { c: number }).c;
+  // AI 解析过的错题数（作业 UI 已下线，徽章改由此统计）
+  const aiAnalyzed = (
+    db.prepare("SELECT COUNT(*) AS c FROM mistakes WHERE ai_analysis != ''").get() as {
+      c: number;
+    }
+  ).c;
 
   // 连续天数
   const logs = db.prepare("SELECT date, hours FROM logs").all() as unknown as {
@@ -65,7 +71,7 @@ export function computeBadges(): Badge[] {
     { id: "week", name: "七日之约", icon: "🔥", desc: "连续学习 7 天", earned: streak >= 7 },
     { id: "cleaner", name: "错题清道夫", icon: "🧹", desc: "累计复习 10 道错题", earned: reviewed >= 10 },
     { id: "hardworker", name: "勤学不辍", icon: "💪", desc: "累计学习 20 小时", earned: totalHours >= 20 },
-    { id: "ai_explorer", name: "AI 探索者", icon: "🤖", desc: "提交过 1 次 AI 批改作业", earned: homework >= 1 },
+    { id: "ai_explorer", name: "AI 探索者", icon: "🤖", desc: "用 AI 解析过 1 道错题", earned: aiAnalyzed >= 1 || homework >= 1 },
     { id: "perfectionist", name: "完美主义者", icon: "🎯", desc: "全部关卡 3 星通关", earned: allThreeStar },
   ];
 }
