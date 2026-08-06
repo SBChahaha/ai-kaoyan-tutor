@@ -40,6 +40,30 @@ export default async function ReportPage() {
   const badges = computeBadges();
   const earnedBadges = badges.filter((b) => b.earned);
 
+  // 本周 vs 上周
+  const now = new Date();
+  const mondayOffset = (now.getDay() + 6) % 7;
+  const thisMonday = new Date(now.getTime() - mondayOffset * 86400000);
+  const lastMonday = new Date(thisMonday.getTime() - 7 * 86400000);
+  const p2 = (n: number) => String(n).padStart(2, "0");
+  const fmt2 = (d: Date) => `${d.getFullYear()}-${p2(d.getMonth() + 1)}-${p2(d.getDate())}`;
+  const thisWeekHours = Math.round(
+    logs.filter((r) => r.date >= fmt2(thisMonday)).reduce((s, r) => s + r.hours, 0) * 10
+  ) / 10;
+  const lastWeekHours =
+    Math.round(
+      logs
+        .filter((r) => r.date >= fmt2(lastMonday) && r.date < fmt2(thisMonday))
+        .reduce((s, r) => s + r.hours, 0) * 10
+    ) / 10;
+  const thisWeekPassed = (
+    db
+      .prepare(
+        "SELECT COUNT(DISTINCT lesson_slug) AS c FROM quiz_attempts WHERE passed = 1 AND created_at >= ?"
+      )
+      .get(thisMonday.toISOString()) as { c: number }
+  ).c;
+
   const today = new Date();
   const p = (n: number) => String(n).padStart(2, "0");
   const fmt = (d: Date) => `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
@@ -76,6 +100,30 @@ export default async function ReportPage() {
         <div className="rounded-xl border border-slate-200 bg-white p-4 text-center">
           <div className="text-2xl font-bold text-orange-600">{pendingM}</div>
           <div className="text-xs text-slate-500">待复习错题</div>
+        </div>
+      </div>
+
+      {/* 本周 vs 上周 */}
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+        <div className="rounded-xl border border-slate-200 bg-white p-4 text-center">
+          <div className="text-2xl font-bold text-blue-600">{thisWeekHours}</div>
+          <div className="text-xs text-slate-500">本周学习（h）</div>
+        </div>
+        <div className="rounded-xl border border-slate-200 bg-white p-4 text-center">
+          <div className="text-2xl font-bold text-slate-600">{lastWeekHours}</div>
+          <div className="text-xs text-slate-500">
+            上周学习（h）
+            {lastWeekHours > 0 && (
+              <span className={thisWeekHours >= lastWeekHours ? "text-green-500" : "text-red-400"}>
+                {" "}
+                {thisWeekHours >= lastWeekHours ? "↑" : "↓"}
+              </span>
+            )}
+          </div>
+        </div>
+        <div className="col-span-2 rounded-xl border border-slate-200 bg-white p-4 text-center md:col-span-1">
+          <div className="text-2xl font-bold text-emerald-600">{thisWeekPassed}</div>
+          <div className="text-xs text-slate-500">本周通关（关）</div>
         </div>
       </div>
 

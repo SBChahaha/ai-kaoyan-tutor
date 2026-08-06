@@ -3,6 +3,7 @@ import Link from "next/link";
 import "./globals.css";
 import { APP_NAME } from "@/lib/config";
 import ShortcutHelp from "./components/ShortcutHelp";
+import BackToTop from "./components/BackToTop";
 
 export const metadata: Metadata = {
   title: APP_NAME,
@@ -42,6 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </header>
         <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
         <ShortcutHelp />
+        <BackToTop />
         <footer className="border-t border-slate-200 py-4 text-center text-xs text-slate-400">
           {APP_NAME} · 按 <kbd className="rounded border border-slate-300 bg-slate-50 px-1 font-mono">?</kbd> 查看快捷键
         </footer>

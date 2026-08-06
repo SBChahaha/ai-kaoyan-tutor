@@ -112,14 +112,14 @@ export default function HomePage() {
           <div className="text-xs text-slate-500">已交作业</div>
           <div className="mt-1 text-2xl font-bold">{homeworkCount} 题</div>
         </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-4">
+        <Link href="/mistakes" className="rounded-xl border border-slate-200 bg-white p-4 hover:border-orange-300">
           <div className="text-xs text-slate-500">待复习错题</div>
           <div className="mt-1 text-2xl font-bold text-orange-600">{pendingMistakes}</div>
-        </div>
-        <div className="rounded-xl border border-slate-200 bg-white p-4">
+        </Link>
+        <Link href="/logs" className="rounded-xl border border-slate-200 bg-white p-4 hover:border-blue-300">
           <div className="text-xs text-slate-500">近 7 天学习</div>
           <div className="mt-1 text-2xl font-bold">{weekHours} h</div>
-        </div>
+        </Link>
       </div>
 
       {/* 今日计划 + 学习统计 */}

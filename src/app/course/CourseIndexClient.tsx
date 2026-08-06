@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 
 type Lesson = { slug: string; title: string; order: number };
@@ -48,6 +49,7 @@ export default function CourseIndexClient({
     (a, s) => a + s.chapters.reduce((b, c) => b + c.lessons.length, 0),
     0
   );
+  const [hidePassed, setHidePassed] = useState(false);
   const flaggedCount = Object.entries(levels).filter(
     ([, lv]) => lv.isBoss === undefined && lv.passed === false && lv.hasQuiz === false
   ).length; // 占位（难点清单在服务端渲染）
@@ -84,6 +86,17 @@ export default function CourseIndexClient({
             </span>
           )}
         </p>
+        {passedCount > 0 && (
+          <label className="mt-2 flex items-center gap-1.5 text-xs text-slate-500">
+            <input
+              type="checkbox"
+              checked={hidePassed}
+              onChange={(e) => setHidePassed(e.target.checked)}
+              className="accent-blue-600"
+            />
+            只看未通关
+          </label>
+        )}
         {flaggedCount > 0 && (
           <p className="mt-1 text-xs text-red-400">📌 有 {flaggedCount} 个难点待复习（见上方清单）</p>
         )}
@@ -101,7 +114,9 @@ export default function CourseIndexClient({
                 <div key={c.chapter}>
                   <h3 className="mb-1.5 text-sm font-semibold text-slate-700">{c.chapter}</h3>
                   <ul className="grid gap-1.5 sm:grid-cols-2">
-                    {c.lessons.map((l) => {
+                    {c.lessons
+                      .filter((l) => !hidePassed || !levels[l.slug]?.passed)
+                      .map((l) => {
                       const lv = levels[l.slug];
                       const isQuiz = !!lv?.hasQuiz;
                       const locked = isQuiz && !lv.unlocked;
