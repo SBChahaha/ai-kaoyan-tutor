@@ -110,6 +110,14 @@ export default function MistakesPage() {
         </div>
       </div>
 
+      {/* 自动整理说明 */}
+      <div className="rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-800">
+        🤖 <b>错题自动整理已开启</b>：闯关测试答错或疑似蒙对的题会自动进入这里（含题目、你的错误答案、正确答案、解析），无需手动录入。
+        <span className="ml-2 text-green-600">
+          也可以在聊天里说"整理错题"并贴出题目，AI 会帮你录入。
+        </span>
+      </div>
+
       {/* 添加错题表单 */}
       <div className="rounded-xl border border-slate-200 bg-white p-4">
         <div className="mb-3 grid gap-2 md:grid-cols-4">

@@ -8,6 +8,7 @@ import {
   type QuizQuestion,
 } from "@/lib/quiz";
 import { db } from "@/lib/db";
+import { getLesson } from "@/lib/course";
 import { chat, type ChatMsg } from "@/lib/llm";
 
 export const runtime = "nodejs";
@@ -159,6 +160,38 @@ export async function POST(req: NextRequest, ctx: Ctx) {
       `INSERT INTO progress (lesson_slug, done, updated_at) VALUES (?, 1, ?)
        ON CONFLICT(lesson_slug) DO UPDATE SET done = 1, updated_at = excluded.updated_at`
     ).run(lessonSlug, new Date().toISOString());
+  }
+
+  // 📝 自动整理错题本：答错 / 疑似蒙对的题自动入库（零手动录入）
+  const lesson = getLesson(lessonSlug);
+  const subject = lesson?.meta.subject ?? "";
+  const chapter = lesson?.meta.chapter ?? "";
+  const findMistake = db.prepare("SELECT id FROM mistakes WHERE question = ?");
+  const addMistake = db.prepare(
+    `INSERT INTO mistakes (subject, chapter, question, my_answer, right_answer, wrong_reason, ai_analysis, status, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, 'pending', ?)`
+  );
+  for (const res of results) {
+    const guessed =
+      res.correct && res.needs_explanation && explainOk[res.index] === false;
+    if (res.correct && !guessed) continue; // 真对的跳过
+    if (findMistake.get(res.question)) continue; // 已存在跳过（去重）
+    const myAnswer =
+      res.type === "choice" && res.given !== null
+        ? (questions[res.index] as Extract<QuizQuestion, { type: "choice" }>).options?.[
+            Number(res.given)
+          ] ?? String(res.given)
+        : String(res.given ?? "未作答");
+    addMistake.run(
+      subject,
+      chapter,
+      res.question,
+      myAnswer,
+      res.correct_answer,
+      guessed ? "闯关答对但解释不过关（疑似蒙对）" : "闯关测试答错",
+      res.explanation,
+      new Date().toISOString()
+    );
   }
 
   return NextResponse.json({
