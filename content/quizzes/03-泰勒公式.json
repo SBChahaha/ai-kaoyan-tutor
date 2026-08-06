@@ -1,0 +1,108 @@
+{
+  "lesson": "03-泰勒公式",
+  "pass_percent": 70,
+  "variants": [
+    {
+      "questions": [
+        {
+          "type": "choice",
+          "question": "lim((arctan x - x)/x³)（x→0）= ？",
+          "options": ["1/3", "-1/3", "0", "不存在"],
+          "answer": 1,
+          "explanation": "arctan x = x - x³/3 + o(x³)，分子 = -x³/3 + o(x³)，答案 -1/3。第 3 课的挑战题，泰勒一行解决。"
+        },
+        {
+          "type": "choice",
+          "question": "sin x 的麦克劳林展开前两项是？",
+          "options": ["x + x³/6", "x - x³/6", "1 - x²/2", "x - x²/2"],
+          "answer": 1,
+          "explanation": "sin x = x - x³/3! + x⁵/5! - … = x - x³/6 + o(x³)。只有奇次项、交替变号。B 正确；C 是 cos x 的开头。"
+        },
+        {
+          "type": "choice",
+          "question": "lim((eˣ - 1 - x - x²/2)/x³)（x→0）= ？",
+          "options": ["1/6", "1/2", "0", "1"],
+          "answer": 0,
+          "explanation": "eˣ = 1 + x + x²/2 + x³/6 + o(x³)，分子 = x³/6 + o(x³)，答案 1/6。展开到与分母同阶。"
+        },
+        {
+          "type": "choice",
+          "question": "x→0 时，√(1+x²) - 1 是 x 的几阶无穷小？",
+          "options": ["1 阶", "2 阶", "3 阶", "4 阶"],
+          "answer": 1,
+          "explanation": "(1+u)^(1/2) - 1 ~ u/2（u = x²），即 ~ x²/2，2 阶无穷小。等价无穷小公式 (1+x)^α - 1 ~ αx 的直接应用。"
+        },
+        {
+          "type": "choice",
+          "question": "用泰勒公式证 eˣ ≥ 1 + x 的关键是？",
+          "options": [
+            "eˣ 展开后除前两项外其余项全为正",
+            "对 eˣ 用零点定理",
+            "eˣ 的导数大于 0",
+            "两边取对数"
+          ],
+          "answer": 0,
+          "explanation": "eˣ = 1 + x + x²/2! + x³/3! + …，x² 以后各项都非负（x 为负时偶次项为正、奇次项为负但整体和仍为正），故 eˣ ≥ 1+x。余项正负判断是泰勒证不等式的核心。"
+        },
+        {
+          "type": "choice",
+          "question": "f''(x) > 0 恒成立，则 f(x) 与 f(x₀) + f'(x₀)(x-x₀) 的关系是？",
+          "options": [
+            "f(x) ≥ f(x₀) + f'(x₀)(x-x₀)，图像在切线之上",
+            "f(x) ≤ f(x₀) + f'(x₀)(x-x₀)，图像在切线之下",
+            "两者相等",
+            "无法判断"
+          ],
+          "answer": 0,
+          "explanation": "一阶泰勒带拉格朗日余项：f(x) = f(x₀) + f'(x₀)(x-x₀) + f''(ξ)(x-x₀)²/2 ≥ 切线（f'' > 0）。这严格证明了'二阶导为正 ⟹ 凹'。"
+        }
+      ]
+    },
+    {
+      "questions": [
+        {
+          "type": "choice",
+          "question": "lim((ln(1+x) - x)/x²)（x→0）= ？",
+          "options": ["1/2", "-1/2", "1", "0"],
+          "answer": 1,
+          "explanation": "ln(1+x) = x - x²/2 + o(x²)，分子 = -x²/2 + o(x²)，答案 -1/2。"
+        },
+        {
+          "type": "choice",
+          "question": "cos x 的麦克劳林展开前两项（非零项）是？",
+          "options": ["1 - x²/2", "x - x³/6", "1 + x²/2", "1 - x"],
+          "answer": 0,
+          "explanation": "cos x = 1 - x²/2! + x⁴/4! - … = 1 - x²/2 + o(x³)。只有偶次项交替变号。"
+        },
+        {
+          "type": "choice",
+          "question": "lim((cos x - 1 + x²/2)/x⁴)（x→0）= ？",
+          "options": ["1/24", "1/12", "0", "-1/24"],
+          "answer": 0,
+          "explanation": "cos x = 1 - x²/2 + x⁴/24 + o(x⁴)，分子 = x⁴/24 + o(x⁴)，答案 1/24。展开必须到 x⁴——这是'差两阶'类型的标准题。"
+        },
+        {
+          "type": "choice",
+          "question": "x→0 时，1 - cos x 是 x 的几阶无穷小？",
+          "options": ["1 阶", "2 阶", "3 阶", "4 阶"],
+          "answer": 1,
+          "explanation": "1 - cos x ~ x²/2，2 阶。与等价无穷小表一致（1-cos x ~ x²/2）。泰勒：cos x = 1 - x²/2 + o(x²)。"
+        },
+        {
+          "type": "choice",
+          "question": "ln(1+x) 的麦克劳林展开第三项（x³ 的系数）是？",
+          "options": ["1/3", "-1/3", "1/6", "-1/6"],
+          "answer": 0,
+          "explanation": "ln(1+x) = x - x²/2 + x³/3 - x⁴/4 + …，x³ 系数 +1/3。交替变号：奇数项正、偶数项负。"
+        },
+        {
+          "type": "choice",
+          "question": "用泰勒展开求 lim(sin x - x)/x³（x→0），需要 sin x 展开到？",
+          "options": ["x 项即可", "x³ 项（含 o(x³)）", "x⁵ 项", "任意阶都行"],
+          "answer": 1,
+          "explanation": "分母 x³，分子 sin x - x 要展到 x³ 才不为零：sin x = x - x³/6 + o(x³)，分子 = -x³/6，答案 -1/6。只展到 x 项会得 0/0 错误结论。"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,138 @@
+{
+  "lesson": "boss-一元函数微分学",
+  "title": "🔱 第二章综合关",
+  "pass_percent": 70,
+  "boss": "一元函数微分学",
+  "variants": [
+    {
+      "questions": [
+        {
+          "type": "choice",
+          "question": "f(x) = |x| 在 x = 0 处是？",
+          "options": ["连续可导", "连续不可导", "可导不连续", "都不满足"],
+          "answer": 1,
+          "explanation": "连续：lim|x| = 0 = f(0)。不可导：左导数 -1、右导数 +1 不等。第一章学的连续与可导关系，第二章用导数的左右导数判定。"
+        },
+        {
+          "type": "choice",
+          "question": "y = x^x（x>0），y' = ？",
+          "options": ["x·x^(x-1)", "xˣln x", "xˣ(ln x + 1)", "xˣ"],
+          "answer": 2,
+          "explanation": "幂指函数：对数求导法，ln y = x ln x，y'/y = ln x + 1。"
+        },
+        {
+          "type": "choice",
+          "question": "拉格朗日中值定理证明 f(b)-f(a) = f'(ξ)(b-a) 时，构造的辅助函数是？",
+          "options": ["F(x) = f(x) - 割线方程", "F(x) = f(x)²", "F(x) = f(x) - f(a)", "F(x) = f(x)/(x-a)"],
+          "answer": 0,
+          "explanation": "F(x) = f(x) - f(a) - [f(b)-f(a)](x-a)/(b-a)，满足 F(a)=F(b)=0，用罗尔。辅助函数构造 = 移项后的差函数。"
+        },
+        {
+          "type": "choice",
+          "question": "lim((x - sin x)/x³)（x→0）= ？",
+          "options": ["1/6", "1/2", "0", "不存在"],
+          "answer": 0,
+          "explanation": "泰勒：sin x = x - x³/6 + o(x³)，分子 = x³/6，答案 1/6。也可洛必达三次。这是'差一阶'经典题。"
+        },
+        {
+          "type": "choice",
+          "question": "y = x³ - 3x² 的拐点是？",
+          "options": ["(1, -2)", "x = 1", "(0, 0)", "没有拐点"],
+          "answer": 0,
+          "explanation": "y' = 3x²-6x，y'' = 6x-6 = 6(x-1)。x=1 处 y'' 变号（x<1 时负、x>1 时正），且 f(1) = 1-3 = -2，拐点 (1,-2)。拐点是点不是横坐标。"
+        },
+        {
+          "type": "choice",
+          "question": "用泰勒公式求 lim((sin x - x)/x³) 时，sin x 展开到？",
+          "options": ["x 项", "x³ 项", "x⁵ 项", "任意项"],
+          "answer": 1,
+          "explanation": "分母 x³，分子需展到 x³ 才出非零首项：sin x = x - x³/6 + o(x³)。展到 x 项会错误得 0。"
+        },
+        {
+          "type": "choice",
+          "question": "曲线 y = x/(x²+1) 的水平渐近线是？",
+          "options": ["y = 0", "y = 1", "x = 0", "无水平渐近线"],
+          "answer": 0,
+          "explanation": "lim(x→∞) x/(x²+1) = 0，水平渐近线 y = 0。x²+1 > 0 无垂直渐近线。"
+        },
+        {
+          "type": "choice",
+          "question": "下列哪项是驻点但不是极值点？",
+          "options": ["y = x³ 在 x=0", "y = x² 在 x=0", "y = -x² 在 x=0", "y = |x| 在 x=0"],
+          "answer": 0,
+          "explanation": "x³ 在 0 处 f'=0（驻点）但 f' = 3x² ≥ 0 不变号，非极值。x² 极小、-x² 极大；|x| 在 0 是极值点但不可导（不是驻点）。"
+        }
+      ]
+    },
+    {
+      "questions": [
+        {
+          "type": "choice",
+          "question": "f(x) = √x 在 x = 0 处？",
+          "options": ["连续可导", "连续不可导（切线竖直）", "可导不连续", "都不满足"],
+          "answer": 1,
+          "explanation": "连续：lim√x = 0。不可导：f'(0) = lim √x/x = lim 1/√x = ∞，导数不存在（垂直切线）。"
+        },
+        {
+          "type": "choice",
+          "question": "参数方程 x = t², y = t³ 在 t=1 处的切线斜率是？",
+          "options": ["3/2", "2/3", "3", "1/2"],
+          "answer": 0,
+          "explanation": "dy/dx = (3t²)/(2t) = 3t/2，t=1 时 3/2。参数方程一阶导 = 两个导数之比。"
+        },
+        {
+          "type": "choice",
+          "question": "证明 eˣ > 1 + x（x ≠ 0）可用？",
+          "options": [
+            "泰勒展开，余项为正",
+            "罗尔定理",
+            "零点定理",
+            "柯西中值定理"
+          ],
+          "answer": 0,
+          "explanation": "eˣ = 1+x+x²/2!+…，x² 后各项和为正 ⟹ eˣ > 1+x。也可用单调性（第 6 课 g(x) 构造法），泰勒更直接。"
+        },
+        {
+          "type": "choice",
+          "question": "lim((eˣ - 1 - x)/x²)（x→0）= ？",
+          "options": ["1/2", "1/6", "1", "0"],
+          "answer": 0,
+          "explanation": "eˣ = 1 + x + x²/2 + o(x²)，分子 = x²/2，答案 1/2。"
+        },
+        {
+          "type": "choice",
+          "question": "f(x) = x⁴ 在 x = 0 处？",
+          "options": ["极大值", "极小值", "驻点非极值", "拐点"],
+          "answer": 1,
+          "explanation": "f'(0) = 0 且 f''(0) = 0——二阶判定失效！但 f⁽⁴⁾(0) = 24 > 0，x⁴ ≥ 0 明显是极小值。注意 f''(0)=0 时二阶判定无法判断，要回到定义或看高阶导数。"
+        },
+        {
+          "type": "choice",
+          "question": "y = ln(1+x) 的麦克劳林展开中 x² 项系数是？",
+          "options": ["1/2", "-1/2", "1", "-1"],
+          "answer": 1,
+          "explanation": "ln(1+x) = x - x²/2 + x³/3 - …，x² 系数 -1/2。"
+        },
+        {
+          "type": "choice",
+          "question": "证明方程 x³ - 3x + 1 = 0 在 (0,1) 内有且仅有一个根，步骤是？",
+          "options": [
+            "零点定理证存在 + 罗尔反证唯一性（f' < 0）",
+            "只证存在性",
+            "只证唯一性",
+            "用最值定理"
+          ],
+          "answer": 0,
+          "explanation": "存在：f(0)=1>0，f(1)=-1<0，零点定理。唯一：f'(x) = 3x²-3 < 0 于 (0,1)，严格递减 ⟹ 至多一根。'有且仅有' = 存在性 + 单调性（或罗尔反证）。"
+        },
+        {
+          "type": "choice",
+          "question": "lim((√(1+x) - 1)/x)（x→0）= ？",
+          "options": ["1/2", "1", "0", "不存在"],
+          "answer": 0,
+          "explanation": "等价无穷小 (1+x)^α - 1 ~ αx：~ x/2，答案 1/2。或泰勒 √(1+x) = 1 + x/2 + o(x)。"
+        }
+      ]
+    }
+  ]
+}

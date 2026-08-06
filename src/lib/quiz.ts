@@ -253,6 +253,7 @@ export function getLevelStates(
 
   for (const key of orderedChapters) {
     const g = byChapter.get(key)!;
+    const chapterName = key.split("/")[1] ?? g.subject;
     const chapterStates: LevelState[] = [];
     for (const l of g.lessons) {
       const hq = hasQuiz(l.slug);
@@ -275,7 +276,7 @@ export function getLevelStates(
     states.push(...chapterStates);
 
     // BOSS 关：本章全部关卡通过才解锁
-    const boss = bosses.find((bq) => bq.chapter === g.subject);
+    const boss = bosses.find((bq) => bq.chapter === chapterName);
     if (boss) {
       const allPassed = chapterStates.filter((s) => s.hasQuiz).every((s) => s.passed);
       const b = best.get(boss.slug);
@@ -289,7 +290,7 @@ export function getLevelStates(
         stars: b?.stars ?? 0,
         attempts: b?.count ?? 0,
         isBoss: true,
-        chapter: g.subject,
+        chapter: chapterName,
       });
       if (b?.passed) prevPassed = true;
     }
