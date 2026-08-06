@@ -102,8 +102,15 @@ export async function POST(req: NextRequest, ctx: Ctx) {
   if (!quiz) return NextResponse.json({ error: "该课程没有关卡" }, { status: 404 });
 
   const body = await req.json();
-  const answers = (body.answers ?? []) as (string | number | null)[];
-  const explanations = (body.explanations ?? []) as (string | null)[];
+  const rawAnswers = body.answers;
+  const rawExplanations = body.explanations;
+  if (!Array.isArray(rawAnswers)) {
+    return NextResponse.json({ error: "answers 必须是数组" }, { status: 400 });
+  }
+  const answers = rawAnswers as (string | number | null)[];
+  const explanations = Array.isArray(rawExplanations)
+    ? (rawExplanations as (string | null)[])
+    : rawAnswers.map(() => null);
   const seed = Number(body.seed ?? 0);
   const practice = body.practice === true; // 练习模式：判分但不写库
 

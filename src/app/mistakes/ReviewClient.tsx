@@ -7,6 +7,7 @@ type RQ = { mistake_id: number; question: string; options: string[] };
 
 export default function ReviewClient({ onDone }: { onDone: () => void }) {
   const [questions, setQuestions] = useState<RQ[] | null>(null);
+  const [seed, setSeed] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
   const [result, setResult] = useState<{
     score: number;
@@ -21,6 +22,7 @@ export default function ReviewClient({ onDone }: { onDone: () => void }) {
     const r = await fetch("/api/review");
     const d = await r.json();
     setQuestions(d.questions);
+    setSeed(d.seed ?? 0);
     setAnswers(d.questions.map(() => -1));
     setResult(null);
   }
@@ -32,7 +34,7 @@ export default function ReviewClient({ onDone }: { onDone: () => void }) {
       const r = await fetch("/api/review", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ answers }),
+        body: JSON.stringify({ answers, seed }),
       });
       const d = await r.json();
       setResult(d);

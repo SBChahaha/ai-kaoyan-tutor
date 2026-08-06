@@ -25,11 +25,26 @@ export async function GET() {
   });
 }
 
-// POST：提交今日回顾
+// POST：提交今日回顾（同日已提交则拒绝，防止刷分）
 export async function POST(req: NextRequest) {
-  const body = await req.json();
+  let body: Record<string, unknown>;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "请求体格式错误" }, { status: 400 });
+  }
   const seed = Number(body.seed ?? 0);
   const answers = (body.answers ?? []) as number[];
+  if (!Array.isArray(answers)) {
+    return NextResponse.json({ error: "answers 必须是数组" }, { status: 400 });
+  }
+  const done = isReviewDoneToday();
+  if (done) {
+    return NextResponse.json(
+      { error: "今天的回顾已经完成，明天再来吧" },
+      { status: 409 }
+    );
+  }
   const questions = buildDailyReview(seed, 5);
 
   const results = questions.map((q, i) => {

@@ -23,6 +23,9 @@ export async function POST(req: NextRequest) {
     if (!question?.trim()) {
       return NextResponse.json({ error: "问题不能为空" }, { status: 400 });
     }
+    if (String(question).length > 4000) {
+      return NextResponse.json({ error: "问题太长了（最多 4000 字）" }, { status: 400 });
+    }
 
     const messages: ChatMsg[] = [
       { role: "system", content: SYSTEM_PROMPT },

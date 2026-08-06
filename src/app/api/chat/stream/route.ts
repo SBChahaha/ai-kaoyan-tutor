@@ -19,6 +19,9 @@ export async function POST(req: NextRequest) {
   if (!question?.trim()) {
     return NextResponse.json({ error: "问题不能为空" }, { status: 400 });
   }
+  if (String(question).length > 4000) {
+    return NextResponse.json({ error: "问题太长了（最多 4000 字）" }, { status: 400 });
+  }
   if (!API_KEY) {
     return new NextResponse("⚠️ 未配置 DEEPSEEK_API_KEY。请在项目根目录的 .env.local 中填入你的 API Key（https://platform.deepseek.com 获取）。", {
       headers: { "Content-Type": "text/plain; charset=utf-8" },

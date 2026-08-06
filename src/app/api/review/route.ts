@@ -4,14 +4,16 @@ import { buildReviewQuestions } from "@/lib/review";
 
 export const runtime = "nodejs";
 
-// GET：生成复习测试（不含答案）
+// GET：生成复习测试（不含答案，返回 seed 供提交判分一致）
 export async function GET(req: NextRequest) {
   const limit = Number(req.nextUrl.searchParams.get("limit") ?? 8);
-  const questions = buildReviewQuestions(limit);
+  const seed = Math.floor(Math.random() * 1e9);
+  const questions = buildReviewQuestions(limit, seed);
   const pending = (
     db.prepare("SELECT COUNT(*) AS c FROM mistakes WHERE status = 'pending'").get() as { c: number }
   ).c;
   return NextResponse.json({
+    seed,
     pending,
     total: questions.length,
     questions: questions.map((q) => ({
@@ -22,11 +24,20 @@ export async function GET(req: NextRequest) {
   });
 }
 
-// POST：提交复习作答，答对自动标记已复习
+// POST：提交复习作答，答对自动标记已复习（用同一 seed 保证选项顺序一致）
 export async function POST(req: NextRequest) {
-  const body = await req.json();
-  const answers = (body.answers ?? []) as number[];
-  const questions = buildReviewQuestions(Number(body.limit ?? 8));
+  let body: Record<string, unknown>;
+  try {
+    body = await req.json();
+  } catch {
+    return NextResponse.json({ error: "请求体格式错误" }, { status: 400 });
+  }
+  const answers = body.answers;
+  if (!Array.isArray(answers)) {
+    return NextResponse.json({ error: "answers 必须是数组" }, { status: 400 });
+  }
+  const seed = Number(body.seed ?? 0);
+  const questions = buildReviewQuestions(Number(body.limit ?? 8), seed);
 
   const results = questions.map((q, i) => {
     const given = answers[i];

@@ -18,6 +18,24 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
+// 种子化洗牌：同一 seed 生成同一顺序（GET 与 POST 判分一致）
+function seededShuffle<T>(arr: T[], seed: number): T[] {
+  const a = [...arr];
+  let s = seed >>> 0;
+  const rand = () => {
+    s = (s + 0x6d2b79f5) >>> 0;
+    let t = s;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 // 艾宾浩斯复习间隔（按复习次数递增）：首次错 1 天后 → 3 天 → 7 天 → 15 天 → 30 天
 export function reviewInterval(reviewCount: number): number {
   const intervals = [1, 3, 7, 15, 30];
@@ -34,7 +52,7 @@ export function nextDueAt(m: {
   return base + reviewInterval(m.review_count ?? 0) * 86400000;
 }
 
-export function buildReviewQuestions(limit = 8): ReviewQuestion[] {
+export function buildReviewQuestions(limit = 8, seed = 0): ReviewQuestion[] {
   // 待复习 + 已到期的已复习错题（艾宾浩斯到期重激活）
   const rows = db.prepare("SELECT * FROM mistakes LIMIT 500").all() as unknown as Mistake[];
   const now = Date.now();
@@ -50,6 +68,7 @@ export function buildReviewQuestions(limit = 8): ReviewQuestion[] {
   });
   const picked = due.slice(0, limit);
   const out: ReviewQuestion[] = [];
+  let pickSeed = seed >>> 0;
 
   for (const m of picked) {
     // 优先使用原题选项（闯关自动入库的错题带 options）
@@ -76,17 +95,19 @@ export function buildReviewQuestions(limit = 8): ReviewQuestion[] {
     }
     if (usedOriginal) continue;
 
-    // 降级：用同科目其他错题的答案合成干扰项
+    // 降级：用同科目其他错题的答案合成干扰项（种子化，保证 GET/POST 一致）
     const others = db
       .prepare(
         "SELECT right_answer FROM mistakes WHERE subject = ? AND right_answer != ? AND id != ? LIMIT 4"
       )
       .all(m.subject, m.right_answer, m.id) as unknown as { right_answer: string }[];
-    const pool = shuffle(
+    const pool = seededShuffle(
       Array.from(
         new Set([m.right_answer, m.my_answer, ...others.map((o) => o.right_answer)].filter(Boolean))
-      )
+      ),
+      pickSeed + m.id
     );
+    pickSeed = (pickSeed + 1) >>> 0;
     if (pool.length >= 2) {
       out.push({
         mistake_id: m.id,
