@@ -6,6 +6,7 @@ import TodayPlans from "./components/TodayPlans";
 import TodayStats from "./components/TodayStats";
 import DailyReviewCard from "./components/DailyReviewCard";
 import BadgesRow from "./components/BadgesRow";
+import PomodoroCard from "./components/PomodoroCard";
 
 export const dynamic = "force-dynamic";
 
@@ -110,6 +111,9 @@ export default function HomePage() {
         <DailyReviewCard />
         <BadgesRow />
       </div>
+
+      {/* 番茄钟 */}
+      <PomodoroCard />
     </div>
   );
 }

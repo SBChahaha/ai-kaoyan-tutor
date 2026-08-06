@@ -25,14 +25,17 @@ export default function LessonViewer({
   prev,
   next,
   initialDone,
+  initialFlagged,
 }: {
   slug: string;
   content: string;
   prev: Nav;
   next: Nav;
   initialDone: boolean;
+  initialFlagged: boolean;
 }) {
   const [done, setDone] = useState(initialDone);
+  const [flagged, setFlagged] = useState(initialFlagged);
   const [saving, setSaving] = useState(false);
 
   async function toggle() {
@@ -49,6 +52,20 @@ export default function LessonViewer({
       setDone(done);
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function toggleFlag() {
+    const nextFlag = !flagged;
+    setFlagged(nextFlag);
+    try {
+      await fetch("/api/progress", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lesson_slug: slug, flagged: nextFlag }),
+      });
+    } catch {
+      setFlagged(flagged);
     }
   }
 
@@ -86,17 +103,30 @@ export default function LessonViewer({
 
         {/* 底部操作 */}
         <div className="mt-4 flex items-center justify-between gap-3">
-          <button
-            onClick={toggle}
-            disabled={saving}
-            className={`rounded-xl px-5 py-2.5 text-sm font-semibold transition ${
-              done
-                ? "bg-green-500 text-white hover:bg-green-600"
-                : "border border-slate-300 bg-white text-slate-600 hover:border-green-400 hover:text-green-600"
-            }`}
-          >
-            {done ? "✓ 已学完（点击取消）" : "标记已学"}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={toggle}
+              disabled={saving}
+              className={`rounded-xl px-5 py-2.5 text-sm font-semibold transition ${
+                done
+                  ? "bg-green-500 text-white hover:bg-green-600"
+                  : "border border-slate-300 bg-white text-slate-600 hover:border-green-400 hover:text-green-600"
+              }`}
+            >
+              {done ? "✓ 已学完（点击取消）" : "标记已学"}
+            </button>
+            <button
+              onClick={toggleFlag}
+              className={`rounded-xl px-4 py-2.5 text-sm font-semibold transition ${
+                flagged
+                  ? "bg-red-500 text-white hover:bg-red-600"
+                  : "border border-slate-300 bg-white text-slate-600 hover:border-red-400 hover:text-red-600"
+              }`}
+              title="标记为难点，出现在课程页难点清单"
+            >
+              {flagged ? "📌 已标难点（点击取消）" : "📌 标记难点"}
+            </button>
+          </div>
           <div className="text-xs text-slate-400">
             上/下一课：{prev ? prev.subject : "—"} → {next ? next.subject : "—"}
           </div>

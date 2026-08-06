@@ -11,23 +11,31 @@ export type LevelInfo = {
   passed: boolean;
   stars: number;
   attempts: number;
+  isBoss?: boolean;
 };
 
 export default function CourseIndexClient({
   subjects,
   levels,
+  bosses,
 }: {
   subjects: Subject[];
   levels: Record<string, LevelInfo>;
+  bosses: Record<string, { slug: string; title: string; level: LevelInfo }>;
 }) {
-  const quizLessons = subjects.flatMap((s) => s.chapters.flatMap((c) => c.lessons)).filter(
-    (l) => levels[l.slug]?.hasQuiz
-  );
+  const quizLessons = subjects
+    .flatMap((s) => s.chapters.flatMap((c) => c.lessons))
+    .filter((l) => levels[l.slug]?.hasQuiz);
   const passedCount = quizLessons.filter((l) => levels[l.slug]?.passed).length;
+  const bossPassed = Object.values(bosses).filter((b) => b.level.passed).length;
+  const bossTotal = Object.keys(bosses).length;
   const total = subjects.reduce(
     (a, s) => a + s.chapters.reduce((b, c) => b + c.lessons.length, 0),
     0
   );
+  const flaggedCount = Object.entries(levels).filter(
+    ([, lv]) => lv.isBoss === undefined && lv.passed === false && lv.hasQuiz === false
+  ).length; // 占位（难点清单在服务端渲染）
 
   return (
     <div className="space-y-8">
@@ -38,6 +46,11 @@ export default function CourseIndexClient({
             🎮 闯关进度
             <span className="ml-2 text-slate-500">
               已通关 {passedCount}/{quizLessons.length} 关
+              {bossTotal > 0 && (
+                <span className="ml-1">
+                  · 🔱 综合关 {bossPassed}/{bossTotal}
+                </span>
+              )}
             </span>
           </span>
           <span className="text-slate-400">讲义 {total - quizLessons.length} 篇</span>
@@ -49,8 +62,11 @@ export default function CourseIndexClient({
           />
         </div>
         <p className="mt-1.5 text-xs text-slate-400">
-          每课一关：读讲义 → 挑战 → 过关解锁下一关（🔒 未解锁 · ⚔️ 可挑战 · ⭐ 已通关）
+          每课一关：读讲义 → 挑战 → 过关解锁下一关（🔒 未解锁 · ⚔️ 可挑战 · ⭐ 已通关 · 🔱 章节综合关）
         </p>
+        {flaggedCount > 0 && (
+          <p className="mt-1 text-xs text-red-400">📌 有 {flaggedCount} 个难点待复习（见上方清单）</p>
+        )}
       </div>
 
       {subjects.map((s) => (
@@ -59,61 +75,100 @@ export default function CourseIndexClient({
             <h2 className="text-lg font-bold">{s.name}</h2>
           </div>
           <div className="space-y-4 rounded-b-2xl border border-t-0 border-slate-200 bg-white p-4">
-            {s.chapters.map((c) => (
-              <div key={c.chapter}>
-                <h3 className="mb-1.5 text-sm font-semibold text-slate-700">{c.chapter}</h3>
-                <ul className="grid gap-1.5 sm:grid-cols-2">
-                  {c.lessons.map((l) => {
-                    const lv = levels[l.slug];
-                    const isQuiz = !!lv?.hasQuiz;
-                    const locked = isQuiz && !lv.unlocked;
-                    const passed = isQuiz && lv.passed;
+            {s.chapters.map((c) => {
+              const boss = bosses[c.chapter];
+              return (
+                <div key={c.chapter}>
+                  <h3 className="mb-1.5 text-sm font-semibold text-slate-700">{c.chapter}</h3>
+                  <ul className="grid gap-1.5 sm:grid-cols-2">
+                    {c.lessons.map((l) => {
+                      const lv = levels[l.slug];
+                      const isQuiz = !!lv?.hasQuiz;
+                      const locked = isQuiz && !lv.unlocked;
+                      const passed = isQuiz && lv.passed;
 
-                    return (
+                      return (
+                        <li
+                          key={l.slug}
+                          className={`flex items-center gap-2 rounded-md border px-2 py-1.5 ${
+                            locked
+                              ? "border-slate-100 bg-slate-50 opacity-60"
+                              : passed
+                                ? "border-green-100 bg-green-50/50"
+                                : "border-slate-100 hover:border-blue-200 hover:bg-blue-50/40"
+                          }`}
+                        >
+                          <span className="w-6 shrink-0 text-center text-sm">
+                            {locked ? "🔒" : passed ? "✅" : isQuiz ? "⚔️" : "📄"}
+                          </span>
+                          {locked ? (
+                            <span className="flex-1 truncate text-sm text-slate-400">
+                              {l.title}
+                            </span>
+                          ) : (
+                            <Link
+                              href={`/course/${encodeURIComponent(l.slug)}`}
+                              className="flex-1 truncate text-sm text-slate-700 hover:text-blue-700"
+                            >
+                              {l.title}
+                            </Link>
+                          )}
+                          {passed && (
+                            <span className="shrink-0 text-sm text-amber-400">
+                              {"★".repeat(lv.stars)}
+                              <span className="text-slate-200">
+                                {"★".repeat(Math.max(0, 3 - lv.stars))}
+                              </span>
+                            </span>
+                          )}
+                          {isQuiz && !passed && !locked && (
+                            <span className="shrink-0 text-xs font-semibold text-blue-600">
+                              学习 →
+                            </span>
+                          )}
+                        </li>
+                      );
+                    })}
+                    {/* BOSS 综合关 */}
+                    {boss && (
                       <li
-                        key={l.slug}
-                        className={`flex items-center gap-2 rounded-md border px-2 py-1.5 ${
-                          locked
-                            ? "border-slate-100 bg-slate-50 opacity-60"
-                            : passed
-                              ? "border-green-100 bg-green-50/50"
-                              : "border-slate-100 hover:border-blue-200 hover:bg-blue-50/40"
+                        className={`col-span-full mt-1 flex items-center gap-2 rounded-xl border-2 px-3 py-2.5 ${
+                          boss.level.unlocked
+                            ? boss.level.passed
+                              ? "border-purple-200 bg-purple-50"
+                              : "border-purple-300 bg-purple-50/60 hover:border-purple-400"
+                            : "border-slate-100 bg-slate-50 opacity-60"
                         }`}
                       >
-                        <span className="w-6 shrink-0 text-center text-sm">
-                          {locked ? "🔒" : passed ? "✅" : isQuiz ? "⚔️" : "📄"}
-                        </span>
-                        {locked ? (
-                          <span className="flex-1 truncate text-sm text-slate-400">
-                            {l.title}
-                          </span>
-                        ) : (
+                        <span className="text-lg">{boss.level.passed ? "🏆" : "🔱"}</span>
+                        {boss.level.unlocked ? (
                           <Link
-                            href={`/course/${encodeURIComponent(l.slug)}`}
-                            className="flex-1 truncate text-sm text-slate-700 hover:text-blue-700"
+                            href={`/course/${encodeURIComponent(boss.slug)}`}
+                            className="flex-1 text-sm font-semibold text-purple-800 hover:text-purple-600"
                           >
-                            {l.title}
+                            {boss.title}
                           </Link>
-                        )}
-                        {passed && (
-                          <span className="shrink-0 text-sm text-amber-400">
-                            {"★".repeat(lv.stars)}
-                            <span className="text-slate-200">
-                              {"★".repeat(Math.max(0, 3 - lv.stars))}
-                            </span>
+                        ) : (
+                          <span className="flex-1 text-sm font-semibold text-slate-400">
+                            {boss.title}（🔒 通关本章全部关卡后解锁）
                           </span>
                         )}
-                        {isQuiz && !passed && !locked && (
-                          <span className="shrink-0 text-xs font-semibold text-blue-600">
-                            学习 →
+                        {boss.level.passed && (
+                          <span className="shrink-0 text-sm text-amber-400">
+                            {"★".repeat(boss.level.stars)}
+                          </span>
+                        )}
+                        {boss.level.unlocked && !boss.level.passed && (
+                          <span className="shrink-0 text-xs font-semibold text-purple-600">
+                            挑战 →
                           </span>
                         )}
                       </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            ))}
+                    )}
+                  </ul>
+                </div>
+              );
+            })}
           </div>
         </section>
       ))}

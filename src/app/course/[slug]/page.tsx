@@ -27,9 +27,10 @@ export default async function LessonPage({
 
   // 服务器端进度 + 作业（AI 可查）
   const prog = db
-    .prepare("SELECT done FROM progress WHERE lesson_slug = ?")
-    .get(lesson.meta.slug) as { done: number } | undefined;
+    .prepare("SELECT done, flagged FROM progress WHERE lesson_slug = ?")
+    .get(lesson.meta.slug) as { done: number; flagged: number } | undefined;
   const initialDone = !!prog?.done;
+  const initialFlagged = !!prog?.flagged;
 
   const hw = null as null; // 作业组件已移除，测试内嵌在课程页
 
@@ -78,6 +79,7 @@ export default async function LessonPage({
         prev={prev ? { slug: prev.slug, title: prev.title, subject: prev.subject } : null}
         next={next ? { slug: next.slug, title: next.title, subject: next.subject } : null}
         initialDone={initialDone}
+        initialFlagged={initialFlagged}
       />
 
       {/* 过渡分隔 */}

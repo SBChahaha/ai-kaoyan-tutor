@@ -1,0 +1,120 @@
+{
+  "lesson": "boss-函数、极限、连续",
+  "title": "🔱 第一章综合关",
+  "pass_percent": 70,
+  "boss": "函数、极限、连续",
+  "variants": [
+    {
+      "questions": [
+        {
+          "type": "choice",
+          "question": "f(x) = ln(x + √(x²+1)) 是奇函数，则 f(-2) 与 f(2) 的关系是？",
+          "options": ["f(-2) = -f(2)", "f(-2) = f(2)", "f(-2) = 2f(2)", "无法确定"],
+          "answer": 0,
+          "explanation": "奇函数定义：f(-x) = -f(x)，取 x=2 即得 f(-2) = -f(2)。这考查的是奇函数定义的直接应用。"
+        },
+        {
+          "type": "choice",
+          "question": "下列函数中，在 (0, +∞) 上单调递减的是？",
+          "options": ["y = x²", "y = eˣ", "y = 1/x", "y = ln x"],
+          "answer": 2,
+          "explanation": "y = 1/x 在 (0,+∞) 上严格递减。x² 与 eˣ 递增，ln x 递增。注意单调性必须指明区间。"
+        },
+        {
+          "type": "choice",
+          "question": "y = lg x² 与 y = 2lg x 的关系是？",
+          "options": [
+            "是同一个函数",
+            "定义域不同，不是同一函数",
+            "值域不同，不是同一函数",
+            "对应法则不同，不是同一函数"
+          ],
+          "answer": 1,
+          "explanation": "前者定义域 {x|x≠0}，后者定义域 {x|x>0}。定义域不同的函数不是同一函数——这是本课最核心的考点。"
+        },
+        {
+          "type": "choice",
+          "question": "函数 f(x) = sin x 在 [0, 2π] 上有反函数吗？",
+          "options": ["有，反函数是 arcsin x", "没有，因为 sin x 在 [0, 2π] 上不单调", "有，反函数是 2π - arcsin x", "没有，因为 sin x 无界"],
+          "answer": 1,
+          "explanation": "反函数存在的必要条件是单射。sin x 在 [0, 2π] 上不单调（如 sin 0 = sin π），不是单射，故无反函数。arcsin x 是 sin x 在 [-π/2, π/2] 上的反函数。"
+        },
+        {
+          "type": "choice",
+          "question": "设 f(x) 是定义在 R 上的奇函数，且 f(1) = 3，则 f(-1) + f(0) = ？",
+          "options": ["6", "0", "-3", "3"],
+          "answer": 1,
+          "explanation": "奇函数 f(0) = 0（因为 f(0) = -f(0)），f(-1) = -f(1) = -3，故 f(-1) + f(0) = -3 + 0 = -3。"
+        },
+        {
+          "type": "choice",
+          "question": "下列命题正确的是？",
+          "options": [
+            "有界函数必有反函数",
+            "周期函数必有最小正周期",
+            "若 f 以 T 为周期，则 f(2x) 以 T/2 为周期",
+            "偶函数的定义域不必关于原点对称"
+          ],
+          "answer": 2,
+          "explanation": "C：f(2(x+T/2)) = f(2x+T) = f(2x)。A 错：有界与单射无关。B 错：常数函数无反。D 错：奇偶函数定义域必须关于原点对称。"
+        }
+      ]
+    },
+    {
+      "questions": [
+        {
+          "type": "choice",
+          "question": "f(x) = x·cos x 是奇函数，则 f(-π/2) = ？",
+          "options": ["-f(π/2)", "f(π/2)", "0", "无法确定"],
+          "answer": 0,
+          "explanation": "奇函数定义直接应用：f(-x) = -f(x)，取 x = π/2 即得。"
+        },
+        {
+          "type": "choice",
+          "question": "函数 y = 1/(1+x²) 在 R 上的值域是？",
+          "options": ["(0, 1]", "[0, 1]", "(0, +∞)", "[1, +∞)"],
+          "answer": 0,
+          "explanation": "1+x² ≥ 1，故 0 < 1/(1+x²) ≤ 1，当 x→±∞ 时趋近 0（取不到），x=0 时取 1，值域 (0,1]。这也是有界性的证明素材。"
+        },
+        {
+          "type": "choice",
+          "question": "y = ln(x² - 3x + 2) 的定义域是？",
+          "options": ["(-∞,1) ∪ (2,+∞)", "(1,2)", "(-∞,2)", "R"],
+          "answer": 0,
+          "explanation": "真数 (x-1)(x-2) > 0，二次不等式解得 x<1 或 x>2。"
+        },
+        {
+          "type": "choice",
+          "question": "下列哪组函数是同一个函数？",
+          "options": [
+            "y = lg x² 与 y = 2lg x",
+            "y = √(x²) 与 y = |x|",
+            "y = (x²-1)/(x-1) 与 y = x+1",
+            "y = lg x 与 y = lg(x²)/2"
+          ],
+          "answer": 1,
+          "explanation": "B：√(x²) = |x|，定义域都是 R，是同一函数。其余三组定义域都不同。"
+        },
+        {
+          "type": "choice",
+          "question": "若 f(x) 是定义在 [-a, a] 上的任意函数，则 g(x) = [f(x) - f(-x)]/2 是？",
+          "options": ["奇函数", "偶函数", "非奇非偶函数", "无法确定"],
+          "answer": 0,
+          "explanation": "g(-x) = [f(-x) - f(x)]/2 = -g(x)，这是奇偶分解中的奇部构造。本课证明过的定理。"
+        },
+        {
+          "type": "choice",
+          "question": "下列函数中，是初等函数的是？",
+          "options": [
+            "y = |x|",
+            "y = { x, x≥0; -x, x<0 }（分段表示）",
+            "y = [x]（取整函数）",
+            "y = { 1, x 为有理数; 0, x 为无理数 }（狄利克雷函数）"
+          ],
+          "answer": 0,
+          "explanation": "y = |x| = √(x²)，由一个式子表示，是初等函数。其余三个都无法用有限次四则与复合的单一式子表示。" 
+        }
+      ]
+    }
+  ]
+}

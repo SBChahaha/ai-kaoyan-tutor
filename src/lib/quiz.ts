@@ -2,6 +2,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { db } from "@/lib/db";
+import { SUBJECTS } from "@/lib/config";
 
 const QUIZ_ROOT = path.join(process.cwd(), "content", "quizzes");
 
@@ -83,6 +84,38 @@ export function hasQuiz(slug: string): boolean {
   return getQuiz(slug) !== null;
 }
 
+// BOSS 综合关：quiz JSON 带 boss 字段（值=章节名），挂在章节末尾
+export type BossQuiz = {
+  slug: string;
+  title: string;
+  chapter: string;
+  pass_percent: number;
+  variantCount: number;
+};
+
+export function getBossQuizzes(): BossQuiz[] {
+  if (!fs.existsSync(QUIZ_ROOT)) return [];
+  const out: BossQuiz[] = [];
+  for (const f of fs.readdirSync(QUIZ_ROOT)) {
+    if (!f.endsWith(".json")) continue;
+    try {
+      const data = JSON.parse(fs.readFileSync(path.join(QUIZ_ROOT, f), "utf-8"));
+      if (data?.boss) {
+        out.push({
+          slug: path.basename(f, ".json"),
+          title: String(data.title ?? "综合关"),
+          chapter: String(data.boss),
+          pass_percent: Number(data.pass_percent ?? 70),
+          variantCount: Array.isArray(data.variants) ? data.variants.length : 1,
+        });
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+  return out;
+}
+
 // 判分：choice 比对选项下标；fill 做文本归一化 + 数值容差
 function normText(s: string): string {
   return s
@@ -128,7 +161,7 @@ export function calcStars(percent: number, passPercent: number): number {
   return 0;
 }
 
-// 闯关状态：按课程顺序线性解锁（有关卡的课才参与）
+// 闯关状态：按课程顺序线性解锁（有关卡的课才参与）；章节末追加 BOSS 综合关
 export type LevelState = {
   slug: string;
   title: string;
@@ -138,16 +171,18 @@ export type LevelState = {
   passed: boolean;
   stars: number;
   attempts: number;
+  isBoss?: boolean;
+  chapter?: string;
 };
 
 export function getLevelStates(
-  lessons: { slug: string; title: string; subject: string }[]
+  lessons: { slug: string; title: string; subject: string; chapter?: string }[]
 ): LevelState[] {
   const attempts = db
     .prepare("SELECT lesson_slug, stars, passed FROM quiz_attempts ORDER BY id")
     .all() as unknown as { lesson_slug: string; stars: number; passed: number }[];
 
-  // 每关取最近一次尝试
+  // 每关取最佳尝试
   const best = new Map<string, { stars: number; passed: boolean; count: number }>();
   for (const a of attempts) {
     const cur = best.get(a.lesson_slug) ?? { stars: 0, passed: false, count: 0 };
@@ -159,22 +194,68 @@ export function getLevelStates(
 
   const states: LevelState[] = [];
   let prevPassed = true; // 第一关默认解锁
+
+  // 按科目-章节分组（保持 config 顺序）
+  const chapterKey = (s: string, c: string) => `${s}/${c}`;
+  const byChapter = new Map<string, { lessons: typeof lessons; subject: string }>();
   for (const l of lessons) {
-    const hq = hasQuiz(l.slug);
-    const b = best.get(l.slug);
-    const passed = !!b?.passed;
-    const unlocked = hq ? prevPassed : true;
-    states.push({
-      slug: l.slug,
-      title: l.title,
-      subject: l.subject,
-      hasQuiz: hq,
-      unlocked,
-      passed,
-      stars: b?.stars ?? 0,
-      attempts: b?.count ?? 0,
-    });
-    if (hq) prevPassed = passed;
+    const key = chapterKey(l.subject, l.chapter ?? "");
+    const g = byChapter.get(key) ?? { lessons: [], subject: l.subject };
+    g.lessons.push(l);
+    byChapter.set(key, g);
+  }
+  // 章节顺序：SUBJECTS 配置顺序
+  const orderedChapters: string[] = [];
+  const bosses = getBossQuizzes();
+  for (const s of SUBJECTS) {
+    for (const ch of s.chapters) {
+      const key = chapterKey(s.name, ch);
+      if (byChapter.has(key)) orderedChapters.push(key);
+    }
+  }
+
+  for (const key of orderedChapters) {
+    const g = byChapter.get(key)!;
+    const chapterStates: LevelState[] = [];
+    for (const l of g.lessons) {
+      const hq = hasQuiz(l.slug);
+      const b = best.get(l.slug);
+      const passed = !!b?.passed;
+      const unlocked = hq ? prevPassed : true;
+      chapterStates.push({
+        slug: l.slug,
+        title: l.title,
+        subject: l.subject,
+        hasQuiz: hq,
+        unlocked,
+        passed,
+        stars: b?.stars ?? 0,
+        attempts: b?.count ?? 0,
+        chapter: g.subject,
+      });
+      if (hq) prevPassed = passed;
+    }
+    states.push(...chapterStates);
+
+    // BOSS 关：本章全部关卡通过才解锁
+    const boss = bosses.find((bq) => bq.chapter === g.subject);
+    if (boss) {
+      const allPassed = chapterStates.filter((s) => s.hasQuiz).every((s) => s.passed);
+      const b = best.get(boss.slug);
+      states.push({
+        slug: boss.slug,
+        title: boss.title,
+        subject: g.subject,
+        hasQuiz: true,
+        unlocked: allPassed && prevPassed,
+        passed: !!b?.passed,
+        stars: b?.stars ?? 0,
+        attempts: b?.count ?? 0,
+        isBoss: true,
+        chapter: g.subject,
+      });
+      if (b?.passed) prevPassed = true;
+    }
   }
   return states;
 }

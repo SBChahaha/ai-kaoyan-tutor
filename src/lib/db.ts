@@ -97,6 +97,13 @@ if (!g.__db) {
   if (!cols.includes("options")) {
     g.__db.exec("ALTER TABLE mistakes ADD COLUMN options TEXT NOT NULL DEFAULT ''");
   }
+  // 迁移：进度表补充难点标记列
+  const pcols = (g.__db.prepare("PRAGMA table_info(progress)").all() as { name: string }[]).map(
+    (c) => c.name
+  );
+  if (!pcols.includes("flagged")) {
+    g.__db.exec("ALTER TABLE progress ADD COLUMN flagged INTEGER NOT NULL DEFAULT 0");
+  }
 }
 export const db = g.__db;
 
