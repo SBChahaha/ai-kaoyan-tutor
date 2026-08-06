@@ -51,11 +51,16 @@ export default function MistakesPage() {
 
   async function add() {
     if (!form.question.trim()) return;
-    await fetch("/api/mistakes", {
+    const r = await fetch("/api/mistakes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
     });
+    if (!r.ok) {
+      const d = await r.json().catch(() => ({}));
+      alert(d.error ?? "录入失败");
+      return;
+    }
     setForm({ ...empty });
     load();
   }
