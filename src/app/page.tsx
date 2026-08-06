@@ -2,6 +2,7 @@ import Link from "next/link";
 import { db, todayStr } from "@/lib/db";
 import { EXAM_DATE } from "@/lib/config";
 import { listLessons } from "@/lib/course";
+import { getLevelStates } from "@/lib/quiz";
 import TodayPlans from "./components/TodayPlans";
 import TodayStats from "./components/TodayStats";
 import DailyReviewCard from "./components/DailyReviewCard";
@@ -49,6 +50,13 @@ export default function HomePage() {
       .get(weekAgoStr) as { s: number }
   ).s;
 
+  // 继续学习：第一个已解锁未通关的关卡
+  const lessons = listLessons();
+  const levelStates = getLevelStates(
+    lessons.map((l) => ({ slug: l.slug, title: l.title, subject: l.subject, chapter: l.chapter }))
+  );
+  const nextLevel = levelStates.find((s) => s.hasQuiz && s.unlocked && !s.passed && !s.isBoss);
+
   return (
     <div className="space-y-6">
       {/* 快速提问 */}
@@ -64,8 +72,16 @@ export default function HomePage() {
             <div className="mt-1 text-sm text-blue-100">天 — 今天也要加油 💪</div>
           </div>
           <div className="flex gap-3 text-sm">
+            {nextLevel && (
+              <Link
+                href={`/course/${encodeURIComponent(nextLevel.slug)}`}
+                className="rounded-lg bg-amber-400 px-4 py-2 font-semibold text-slate-900 hover:bg-amber-300"
+              >
+                ▶ 继续学习：{nextLevel.title}
+              </Link>
+            )}
             <Link
-              href="/notes"
+              href="/course"
               className="rounded-lg bg-white/15 px-4 py-2 hover:bg-white/25"
             >
               📚 去学习
