@@ -2,6 +2,14 @@
 export const EXAM_DATE = "2026-12-19"; // 初试日期（预计，以官方为准）
 export const APP_NAME = "AI 考研助教";
 
+// 科目主题色（课程页 UI）
+export const SUBJECT_COLORS: Record<string, { grad: string; text: string; badge: string }> = {
+  "数学一": { grad: "from-indigo-500 to-blue-600", text: "text-indigo-600", badge: "bg-indigo-100 text-indigo-700" },
+  "408": { grad: "from-emerald-500 to-teal-600", text: "text-emerald-600", badge: "bg-emerald-100 text-emerald-700" },
+  "英语一": { grad: "from-amber-500 to-orange-600", text: "text-amber-600", badge: "bg-amber-100 text-amber-700" },
+  "政治": { grad: "from-rose-500 to-pink-600", text: "text-rose-600", badge: "bg-rose-100 text-rose-700" },
+};
+
 // 科目树：科目 -> 章节（种子数据用，408 按考纲）
 export const SUBJECTS: { name: string; chapters: string[] }[] = [
   {
