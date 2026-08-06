@@ -35,6 +35,7 @@ export default function MistakesPage() {
   const [busy, setBusy] = useState(false);
   const [aiId, setAiId] = useState<number | null>(null);
   const [selected, setSelected] = useState<Set<number>>(new Set());
+  const [search, setSearch] = useState("");
 
   async function load() {
     const r = await fetch("/api/mistakes");
@@ -102,6 +103,17 @@ export default function MistakesPage() {
   }
 
   const shown = filter ? list.filter((m) => m.subject === filter) : list;
+  const kw = search.trim().toLowerCase();
+  const shownFiltered = kw
+    ? shown.filter(
+        (m) =>
+          m.question.toLowerCase().includes(kw) ||
+          (m.right_answer ?? "").toLowerCase().includes(kw) ||
+          (m.my_answer ?? "").toLowerCase().includes(kw) ||
+          (m.wrong_reason ?? "").toLowerCase().includes(kw) ||
+          (m.chapter ?? "").toLowerCase().includes(kw)
+      )
+    : shown;
   const pendingCount = list.filter((m) => m.status === "pending").length;
 
   // 逾期天数（待复习超过 3 天）
@@ -273,8 +285,8 @@ export default function MistakesPage() {
         </button>
       </div>
 
-      {/* 筛选 */}
-      <div className="flex gap-2">
+      {/* 筛选 + 搜索 */}
+      <div className="flex flex-wrap items-center gap-2">
         <button
           onClick={() => setFilter("")}
           className={`rounded-full px-3 py-1 text-xs ${!filter ? "bg-blue-600 text-white" : "bg-slate-200 text-slate-600"}`}
@@ -290,14 +302,22 @@ export default function MistakesPage() {
             {s}
           </button>
         ))}
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="🔍 搜题目/答案/原因…"
+          className="ml-auto w-48 rounded-lg border border-slate-300 px-3 py-1.5 text-sm focus:border-blue-400 focus:outline-none"
+        />
       </div>
 
       {/* 错题列表 */}
       <div className="space-y-3">
-        {shown.length === 0 && (
-          <p className="py-8 text-center text-sm text-slate-400">还没有错题，做题后记得录入 📝</p>
+        {shownFiltered.length === 0 && (
+          <p className="py-8 text-center text-sm text-slate-400">
+            {kw ? "没有匹配的错题，换个关键词试试" : "还没有错题，做题后记得录入 📝"}
+          </p>
         )}
-        {shown.map((m) => (
+        {shownFiltered.map((m) => (
           <div key={m.id} className="rounded-xl border border-slate-200 bg-white p-4">
             <div className="mb-2 flex flex-wrap items-center gap-2 text-xs">
               <input

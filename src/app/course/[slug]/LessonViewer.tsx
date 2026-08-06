@@ -1,12 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
+import { useRouter } from "next/navigation";
 
 type Nav = { slug: string; title: string; subject: string } | null;
 
@@ -37,6 +38,42 @@ export default function LessonViewer({
   const [done, setDone] = useState(initialDone);
   const [flagged, setFlagged] = useState(initialFlagged);
   const [saving, setSaving] = useState(false);
+  const [fontScale, setFontScale] = useState(1);
+  const [dark, setDark] = useState(false);
+  const router = useRouter();
+
+  // 阅读偏好持久化
+  useEffect(() => {
+    const fs = Number(localStorage.getItem("lesson_font_scale") ?? 1);
+    const dk = localStorage.getItem("lesson_dark") === "1";
+    if (fs >= 0.85 && fs <= 1.3) setFontScale(fs);
+    setDark(dk);
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("lesson_font_scale", String(fontScale));
+  }, [fontScale]);
+
+  useEffect(() => {
+    localStorage.setItem("lesson_dark", dark ? "1" : "0");
+  }, [dark]);
+
+  // J/K 上一课/下一课
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLInputElement) return;
+      if (e.key.toLowerCase() === "j" && next) {
+        e.preventDefault();
+        router.push(`/course/${encodeURIComponent(next.slug)}`);
+      }
+      if (e.key.toLowerCase() === "k" && prev) {
+        e.preventDefault();
+        router.push(`/course/${encodeURIComponent(prev.slug)}`);
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
 
   async function toggle() {
     const nextDone = !done;
@@ -86,8 +123,50 @@ export default function LessonViewer({
     <div className="flex gap-8">
       {/* 正文 */}
       <article className="min-w-0 flex-1">
-        <div className="rounded-2xl border border-slate-200 bg-white px-6 py-8 md:px-10">
-          <div className="prose prose-slate max-w-none prose-headings:font-bold prose-h1:text-2xl prose-h2:mt-8 prose-h2:border-b prose-h2:border-slate-100 prose-h2:pb-2 prose-h2:text-xl prose-h3:text-lg">
+        {/* 阅读工具栏：字号 + 夜间 + 快捷键提示 */}
+        <div className="no-print mb-3 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => setFontScale((s) => Math.max(0.85, +(s - 0.1).toFixed(2)))}
+              className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+              title="减小字号"
+            >
+              A−
+            </button>
+            <button
+              onClick={() => setFontScale((s) => Math.min(1.3, +(s + 0.1).toFixed(2)))}
+              className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm font-semibold text-slate-600 hover:bg-slate-50"
+              title="增大字号"
+            >
+              A+
+            </button>
+            <button
+              onClick={() => setDark((d) => !d)}
+              className={`rounded-lg border px-3 py-1.5 text-sm font-semibold transition ${
+                dark
+                  ? "border-indigo-300 bg-indigo-600 text-white"
+                  : "border-slate-300 bg-white text-slate-600 hover:bg-slate-50"
+              }`}
+              title="夜间阅读（仅讲义区）"
+            >
+              🌙 夜间
+            </button>
+          </div>
+          <span className="text-xs text-slate-400">
+            快捷键：K 上一课 / J 下一课
+          </span>
+        </div>
+        <div
+          className={`rounded-2xl border px-6 py-8 transition-colors md:px-10 ${
+            dark ? "lesson-dark border-slate-700 bg-slate-900" : "border-slate-200 bg-white"
+          }`}
+          style={{ fontSize: `${fontScale}em` }}
+        >
+          <div
+            className={`prose max-w-none prose-headings:font-bold prose-h1:text-2xl prose-h2:mt-8 prose-h2:border-b prose-h2:pb-2 prose-h2:text-xl prose-h3:text-lg ${
+              dark ? "lesson-dark prose-invert" : "prose-slate"
+            }`}
+          >
             <ReactMarkdown
               remarkPlugins={[remarkGfm, remarkMath]}
               rehypePlugins={[rehypeKatex]}

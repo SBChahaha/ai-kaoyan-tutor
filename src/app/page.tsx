@@ -9,6 +9,7 @@ import BadgesRow from "./components/BadgesRow";
 import PomodoroCard from "./components/PomodoroCard";
 import BackupRestore from "./components/BackupRestore";
 import QuickAsk from "./components/QuickAsk";
+import BadgeToast from "./components/BadgeToast";
 
 export const dynamic = "force-dynamic";
 
@@ -51,6 +52,7 @@ export default function HomePage() {
     <div className="space-y-6">
       {/* 快速提问 */}
       <QuickAsk />
+      <BadgeToast />
 
       {/* 倒计时横幅 */}
       <div className="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white">

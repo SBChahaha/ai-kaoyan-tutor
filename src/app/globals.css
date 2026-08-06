@@ -103,6 +103,41 @@ body {
   font-size: 1.05em;
 }
 
+/* ===== 夜间阅读（仅讲义区） ===== */
+.lesson-dark .prose {
+  color: #cbd5e1;
+}
+.lesson-dark .prose h1,
+.lesson-dark .prose h2,
+.lesson-dark .prose h3,
+.lesson-dark .prose h4,
+.lesson-dark .prose strong {
+  color: #f1f5f9;
+}
+.lesson-dark .prose a {
+  color: #93c5fd;
+}
+.lesson-dark .prose blockquote {
+  color: #94a3b8;
+  border-left-color: #7c3aed;
+  background: rgba(124, 58, 237, 0.08);
+}
+.lesson-dark .prose table td,
+.lesson-dark .prose table th {
+  border-color: #475569;
+}
+.lesson-dark .prose table thead th {
+  background: #334155;
+  color: #f1f5f9;
+}
+.lesson-dark .prose code {
+  background: #334155;
+  color: #e2e8f0;
+}
+.lesson-dark .katex {
+  color: #e2e8f0;
+}
+
 /* ===== 打印模式（讲义打印） ===== */
 @media print {
   header,

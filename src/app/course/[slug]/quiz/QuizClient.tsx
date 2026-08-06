@@ -64,6 +64,44 @@ export default function QuizClient({
       .catch(() => setQuestions([]));
   }, [lessonSlug]);
 
+  // ⌨️ 键盘快捷键：A-D/1-4 选答案、Enter 下一题/提交、←→ 切题
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (!questions || summary || busy) return;
+      if (e.target instanceof HTMLTextAreaElement || e.target instanceof HTMLInputElement) return;
+      const key = e.key.toLowerCase();
+      const cur = questions[current];
+      if (cur.type === "choice") {
+        const idx = ["a", "b", "c", "d"].indexOf(key);
+        if (idx >= 0 && idx < (cur.options?.length ?? 0)) {
+          e.preventDefault();
+          choose(idx);
+          return;
+        }
+        const num = Number(key);
+        if (num >= 1 && num <= 4 && num - 1 < (cur.options?.length ?? 0)) {
+          e.preventDefault();
+          choose(num - 1);
+          return;
+        }
+      }
+      if (key === "enter") {
+        e.preventDefault();
+        if (answerGiven && !needExplain) {
+          if (current < questions.length - 1) setCurrent((c) => Math.min(questions.length - 1, c + 1));
+          else if (allAnswered && allExplained) submit();
+        }
+        return;
+      }
+      if (key === "arrowleft" && current > 0) setCurrent((c) => c - 1);
+      if (key === "arrowright" && current < questions.length - 1 && answerGiven && !needExplain) {
+        setCurrent((c) => c + 1);
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
+
   if (!questions) {
     return <div className="p-10 text-center text-slate-400">加载关卡…</div>;
   }
@@ -245,7 +283,8 @@ export default function QuizClient({
             第 {current + 1}/{questions.length} 题
           </span>
           <span className="text-xs text-slate-400">
-            变式 {variantIndex + 1}/{variantCount}（每局随机）· 通过线 {passPercent}%
+            变式 {variantIndex + 1}/{variantCount} · 通过线 {passPercent}%
+            · 快捷键 A-D 选 / Enter 下一题
           </span>
         </div>
         <div className="h-2 overflow-hidden rounded-full bg-slate-200">
