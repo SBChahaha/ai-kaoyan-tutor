@@ -4,6 +4,8 @@ import { EXAM_DATE } from "@/lib/config";
 import { listLessons } from "@/lib/course";
 import TodayPlans from "./components/TodayPlans";
 import TodayStats from "./components/TodayStats";
+import DailyReviewCard from "./components/DailyReviewCard";
+import BadgesRow from "./components/BadgesRow";
 
 export const dynamic = "force-dynamic";
 
@@ -101,6 +103,12 @@ export default function HomePage() {
           <TodayPlans />
         </div>
         <TodayStats />
+      </div>
+
+      {/* 每日回顾 + 成就 */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <DailyReviewCard />
+        <BadgesRow />
       </div>
     </div>
   );

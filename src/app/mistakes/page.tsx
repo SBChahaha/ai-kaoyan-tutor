@@ -129,6 +129,18 @@ export default function MistakesPage() {
         />
       )}
 
+      {/* 导出 */}
+      {list.length > 0 && (
+        <div className="flex justify-end">
+          <a
+            href="/api/mistakes/export"
+            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm text-slate-600 hover:bg-slate-50"
+          >
+            ⬇️ 导出 Markdown
+          </a>
+        </div>
+      )}
+
       {/* 添加错题表单 */}
       <div className="rounded-xl border border-slate-200 bg-white p-4">
         <div className="mb-3 grid gap-2 md:grid-cols-4">

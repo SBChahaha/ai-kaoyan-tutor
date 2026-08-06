@@ -77,6 +77,13 @@ if (!g.__db) {
       key TEXT PRIMARY KEY,
       value TEXT NOT NULL
     );
+    CREATE TABLE IF NOT EXISTS daily_review (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      date TEXT NOT NULL,
+      score INTEGER NOT NULL,
+      total INTEGER NOT NULL,
+      created_at TEXT NOT NULL
+    );
     CREATE INDEX IF NOT EXISTS idx_notes_subject ON notes(subject);
     CREATE INDEX IF NOT EXISTS idx_mistakes_subject ON mistakes(subject);
     CREATE INDEX IF NOT EXISTS idx_logs_date ON logs(date);
