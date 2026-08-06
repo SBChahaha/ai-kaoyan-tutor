@@ -1,0 +1,128 @@
+{
+  "lesson": "boss-一元函数积分学",
+  "title": "🔱 第三章综合关",
+  "pass_percent": 70,
+  "boss": "一元函数积分学",
+  "variants": [
+    {
+      "questions": [
+        {
+          "type": "choice",
+          "question": "∫₀^(π/2) sin²x dx = ？",
+          "options": ["π/4", "π/2", "1/2", "π"],
+          "answer": 0,
+          "explanation": "华里士公式 n=2（偶数）：(1/2)·(π/2) = π/4，或降幂公式直接积分。这是考研最爱考的基础积分。"
+        },
+        {
+          "type": "choice",
+          "question": "lim(x→0) (∫₀ˣ e^(t²)dt)/x = ？",
+          "options": ["0", "1", "e", "不存在"],
+          "answer": 1,
+          "explanation": "0/0 洛必达：分子 e^(x²)→1。变上限积分求导是积分学核心考点，配合洛必达是固定组合。"
+        },
+        {
+          "type": "choice",
+          "question": "∫₁^(+∞) 1/x^p dx 收敛的充要条件是？",
+          "options": ["p > 1", "p < 1", "p ≥ 1", "p ≤ 1"],
+          "answer": 0,
+          "explanation": "无穷限 p 积分：p>1 收敛，p=1 是分界线（1/x 发散）。与无界函数 p 积分（p<1 收敛）正好相反。"
+        },
+        {
+          "type": "choice",
+          "question": "∫₀¹ dx/x² 的敛散性是？",
+          "options": ["收敛，值为 1", "收敛，值为 -1", "发散", "收敛，值为 2"],
+          "answer": 2,
+          "explanation": "x=0 瑕点，p=2≥1 发散。若直接代牛顿-莱布尼茨得 -1——被积函数恒正积分不可能为负，这是瑕积分最经典的陷阱。"
+        },
+        {
+          "type": "choice",
+          "question": "y = x 与 y = x² 围成图形绕 x 轴旋转的体积是？",
+          "options": ["π∫₀¹(x - x²)²dx", "π∫₀¹(x² - x⁴)dx", "π∫₀¹(x - x²)dx", "π/3"],
+          "answer": 1,
+          "explanation": "垫片法：外半径平方减内半径平方 π∫(x²-x⁴)dx = 2π/15。平方差≠差的平方，必考陷阱。"
+        },
+        {
+          "type": "choice",
+          "question": "∫₀^(+∞) xe^(-x) dx = ？",
+          "options": ["1", "0", "发散", "2"],
+          "answer": 0,
+          "explanation": "分部：[-xe^(-x)]₀^∞ + ∫₀^∞ e^(-x)dx = 1。lim(be^(-b))=0。推广 ∫xⁿe^(-x)dx = n!。"
+        },
+        {
+          "type": "choice",
+          "question": "∫₋₁¹ (x³ + x⁵cos x) dx = ？",
+          "options": ["2∫₀¹x³ dx", "0", "∫₀¹x³ dx", "2/3"],
+          "answer": 1,
+          "explanation": "x³ 和 x⁵cos x 都是奇函数（奇×偶=奇），对称区间积分为 0。先看奇偶再动手是定积分第一原则。"
+        },
+        {
+          "type": "choice",
+          "question": "设 F(x) = ∫₀ˣ(x-t)f(t)dt，f 连续，F''(x) = ？",
+          "options": ["f(x)", "xf(x)", "f'(x)", "∫₀ˣ f(t)dt"],
+          "answer": 0,
+          "explanation": "拆 x：F = x∫₀ˣf - ∫₀ˣtf；F' = ∫₀ˣf + xf - xf = ∫₀ˣf；F'' = f(x)。被积函数含 x 先拆再求导——高阶综合题。"
+        }
+      ]
+    },
+    {
+      "questions": [
+        {
+          "type": "choice",
+          "question": "∫₀¹ √(1-x²) dx = ？",
+          "options": ["1", "π/4", "π/2", "1/2"],
+          "answer": 1,
+          "explanation": "单位圆第一象限面积 π/4。几何意义速算。换元 x=sin t 也可得。"
+        },
+        {
+          "type": "choice",
+          "question": "∫₀¹ 1/√x dx = ？",
+          "options": ["1", "2", "发散", "1/2"],
+          "answer": 1,
+          "explanation": "瑕点 x=0，p=1/2<1 收敛，值为 2。无界函数 p 积分 p<1 收敛。"
+        },
+        {
+          "type": "choice",
+          "question": "∫₁^(+∞) (x+√x)/(x²+1) dx 的敛散性是？",
+          "options": ["收敛", "发散", "收敛且值为 1", "无法判断"],
+          "answer": 1,
+          "explanation": "抓大头 ~1/x（x→∞），与 p=1 同阶发散。极限比较法判敛。"
+        },
+        {
+          "type": "choice",
+          "question": "f 以 T 为周期连续，∫ₐ^(a+T) f(x)dx = ？",
+          "options": ["与 a 有关", "∫₀ᵀ f(x)dx（与 a 无关）", "0", "T·f(a)"],
+          "answer": 1,
+          "explanation": "周期函数一个完整周期的积分与起点无关。可令 x = t+a 平移验证。"
+        },
+        {
+          "type": "choice",
+          "question": "y = x²（0≤x≤1）绕 y 轴旋转的体积是？",
+          "options": ["π/2", "π/4", "2π/3", "π/5"],
+          "answer": 0,
+          "explanation": "柱壳法 V = 2π∫₀¹x·x²dx = π/2。绕 y 轴用柱壳（半径 x），绕 x 轴用圆片（半径 f(x)）。"
+        },
+        {
+          "type": "choice",
+          "question": "∫₂^(+∞) dx/(x(ln x)²) 的敛散性是？",
+          "options": ["发散", "收敛，值为 1/ln 2", "收敛，值为 1", "无法判断"],
+          "answer": 1,
+          "explanation": "换元 u=ln x：∫du/u² 收敛，值 1/ln 2。ln 幂次在分母 p>1 收敛——与 p 积分同构的模型。"
+        },
+        {
+          "type": "choice",
+          "question": "y = (2/3)x^(3/2) 在 [0,1] 上的弧长是？",
+          "options": ["(2/3)(2√2-1)", "(2/3)(√2-1)", "√2", "2/3"],
+          "answer": 0,
+          "explanation": "s = ∫₀¹√(1+x)dx = (2/3)(2√2-1)。弧长微元 ds = √(1+y'²)dx。"
+        },
+        {
+          "type": "choice",
+          "question": "∫₀¹ x·eˣ dx = ？",
+          "options": ["1", "e-1", "e", "e-2"],
+          "answer": 0,
+          "explanation": "分部积分：[xeˣ]₀¹ - ∫₀¹eˣdx = e - (e-1) = 1。定积分分部注意 uv 整体代端点。"
+        }
+      ]
+    }
+  ]
+}

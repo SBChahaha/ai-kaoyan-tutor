@@ -1,0 +1,98 @@
+{
+  "lesson": "04-定积分的应用",
+  "pass_percent": 70,
+  "variants": [
+    {
+      "questions": [
+        {
+          "type": "choice",
+          "question": "y = x² 与 y = 2x 围成的面积是？",
+          "options": ["4/3", "2/3", "8/3", "2"],
+          "answer": 0,
+          "explanation": "交点 x=0,2；S = ∫₀²(2x - x²)dx = [x² - x³/3]₀² = 4 - 8/3 = 4/3。上减下。"
+        },
+        {
+          "type": "choice",
+          "question": "y = √x（0≤x≤1）绕 x 轴旋转一周的体积是？",
+          "options": ["π/2", "π", "π/3", "2π"],
+          "answer": 0,
+          "explanation": "圆片法：V = π∫₀¹(√x)²dx = π∫₀¹x dx = π/2。绕 x 轴用圆片：半径=函数值。"
+        },
+        {
+          "type": "choice",
+          "question": "y = x 与 y = x² 围成图形绕 x 轴旋转的体积是？",
+          "options": ["π∫₀¹(x - x²)²dx", "π∫₀¹(x² - x⁴)dx", "π∫₀¹(x² - x²)dx", "π∫₀¹(x - x²)dx"],
+          "answer": 1,
+          "explanation": "垫片法：外半径平方减内半径平方 = π∫(x² - x⁴)dx。注意不是 π∫(x - x²)²dx——平方差 ≠ 差的平方，这是高频陷阱！"
+        },
+        {
+          "type": "choice",
+          "question": "y = x²（0≤x≤1）绕 y 轴旋转的体积是？",
+          "options": ["π/2", "π/4", "2π/3", "π/5"],
+          "answer": 0,
+          "explanation": "柱壳法：V = 2π∫₀¹x·x²dx = 2π·(1/4) = π/2。绕 y 轴用柱壳：半径 x、高 f(x)。"
+        },
+        {
+          "type": "choice",
+          "question": "y = (2/3)x^(3/2) 在 [0,1] 上的弧长是？",
+          "options": ["(2/3)(2√2 - 1)", "(2/3)(√2 - 1)", "√2", "2/3"],
+          "answer": 0,
+          "explanation": "y' = √x，s = ∫₀¹√(1+x)dx = (2/3)(1+x)^(3/2)|₀¹ = (2/3)(2√2 - 1)。弧长微元 ds = √(1+y'²)dx。"
+        },
+        {
+          "type": "choice",
+          "question": "极坐标曲线 r = r(θ)（α≤θ≤β）围成的面积是？",
+          "options": ["∫r dθ", "(1/2)∫r² dθ", "∫r² dθ", "(1/2)∫r dθ"],
+          "answer": 1,
+          "explanation": "扇形微元 dS = (1/2)r²dθ。极坐标面积必带 1/2 和 r²——扇形面积公式的积分版。"
+        }
+      ]
+    },
+    {
+      "questions": [
+        {
+          "type": "choice",
+          "question": "y = x² 与 y = √x 围成的面积是？",
+          "options": ["1/3", "2/3", "1", "1/2"],
+          "answer": 0,
+          "explanation": "交点 0 和 1：S = ∫₀¹(√x - x²)dx = 2/3 - 1/3 = 1/3。先求交点确定积分限。"
+        },
+        {
+          "type": "choice",
+          "question": "y = f(x) ≥ 0 与 x 轴、x=a、x=b 围成图形绕 x 轴旋转的体积是？",
+          "options": ["π∫ₐᵇ f(x)dx", "π∫ₐᵇ f²(x)dx", "2π∫ₐᵇ f(x)dx", "∫ₐᵇ f²(x)dx"],
+          "answer": 1,
+          "explanation": "圆片法：dV = πf²(x)dx（半径 f 的薄圆片）。体积必带 π 且是函数平方——这是旋转体体积的标准公式。"
+        },
+        {
+          "type": "choice",
+          "question": "由 x = φ(y)、x = ψ(y)（φ≥ψ）与 y=c、y=d 围成的面积是？",
+          "options": ["∫(φ-ψ)dy", "∫(φ²-ψ²)dy", "∫(φ+ψ)dy", "∫(ψ-φ)dy"],
+          "answer": 0,
+          "explanation": "y 型：右减左，S = ∫(φ(y) - ψ(y))dy。x 型是上减下 ∫(f-g)dx。选 y 型当函数是 x=f(y) 形式时。"
+        },
+        {
+          "type": "choice",
+          "question": "参数方程曲线 x=x(t), y=y(t) 的弧长是？",
+          "options": ["∫√(x'²+y'²) dt", "∫(x'+y') dt", "∫√(x²+y²) dt", "∫(x'²+y'²) dt"],
+          "answer": 0,
+          "explanation": "ds = √(dx²+dy²) = √(x'²+y'²)dt。参数方程弧长：两个导数平方和开根再积分。"
+        },
+        {
+          "type": "choice",
+          "question": "变力 F(x) = kx（弹簧）从 0 拉到 L 做功是？",
+          "options": ["kL²", "kL²/2", "kL", "kL/3"],
+          "answer": 1,
+          "explanation": "W = ∫₀ᴸ kx dx = kL²/2。变力做功 = 力对位移积分。"
+        },
+        {
+          "type": "choice",
+          "question": "旋转曲面侧面积（y=f(x) 绕 x 轴）的公式是？",
+          "options": ["2π∫|f|√(1+f'²) dx", "π∫f² dx", "2π∫f dx", "π∫|f|√(1+f'²) dx"],
+          "answer": 0,
+          "explanation": "dS = 2π|f(x)|·ds = 2π|f|√(1+f'²)dx——周长 2πr × 弧长微元 ds。侧面积 = 周长 × 弧长微元的积分。"
+        }
+      ]
+    }
+  ]
+}
