@@ -1,0 +1,98 @@
+{
+  "lesson": "01-导数与微分",
+  "pass_percent": 70,
+  "variants": [
+    {
+      "questions": [
+        {
+          "type": "choice",
+          "question": "f(x) = |x| 在 x = 0 处？",
+          "options": ["连续且可导", "连续但不可导", "可导但不连续", "既不连续也不可导"],
+          "answer": 1,
+          "explanation": "连续：lim|x| = 0 = f(0)。不可导：左导数 lim(x→0⁻)(-x)/x = -1，右导数 lim(x→0⁺)x/x = 1，左右导数不等。尖点处没有切线——连续不⟹可导的经典例子。"
+        },
+        {
+          "type": "choice",
+          "question": "设 f'(0) 存在，则 lim(f(2x)-f(0))/x（x→0）= ？",
+          "options": ["f'(0)", "2f'(0)", "f'(0)/2", "不存在"],
+          "answer": 1,
+          "explanation": "凑定义：lim(f(0+2x)-f(0))/(2x) · 2 = f'(0)·2 = 2f'(0)。套路：分母改成与分子增量一致（2x），再补系数。"
+        },
+        {
+          "type": "choice",
+          "question": "y = sin(2x+1)，y' = ？",
+          "options": ["cos(2x+1)", "2cos(2x+1)", "cos 2", "-2cos(2x+1)"],
+          "answer": 1,
+          "explanation": "链式法则：外层 sin 导为 cos(2x+1)，内层 2x+1 导为 2，相乘得 2cos(2x+1)。漏乘内层导数是复合求导第一错误。"
+        },
+        {
+          "type": "choice",
+          "question": "y = x²·eˣ，则 y⁽¹⁰⁰⁾ = ？",
+          "options": ["x²eˣ", "(x²+200x+9900)eˣ", "(x²+100x+4950)eˣ", "100x·eˣ"],
+          "answer": 1,
+          "explanation": "莱布尼茨公式：x² 三阶以上导数为 0，只需三项：x²eˣ + 100·2x·eˣ + C(100,2)·2·eˣ = (x²+200x+9900)eˣ。多项式因子让级数瞬间截断。"
+        },
+        {
+          "type": "choice",
+          "question": "y = xˣ（x>0），y' = ？",
+          "options": ["x·x^(x-1)", "xˣ·ln x", "xˣ(ln x + 1)", "xˣ"],
+          "answer": 2,
+          "explanation": "幂指函数不能用幂函数公式（底数含 x）也不适用指数公式（指数含 x）。对数求导：ln y = x ln x，y'/y = ln x + 1，y' = xˣ(ln x+1)。"
+        },
+        {
+          "type": "choice",
+          "question": "曲线 x² + y² = 1 在 (√2/2, √2/2) 处的切线斜率是？",
+          "options": ["1", "-1", "0", "不存在"],
+          "answer": 1,
+          "explanation": "隐函数求导：2x + 2yy' = 0，y' = -x/y，代入 (√2/2,√2/2) 得 y' = -1。圆在该点的切线斜率 -1（半径斜率 1，切线垂直）。"
+        }
+      ]
+    },
+    {
+      "questions": [
+        {
+          "type": "choice",
+          "question": "f(x) = x·sin(1/x)（x≠0），f(0) = 0。f 在 x=0 处？",
+          "options": ["连续且可导", "连续但不可导", "可导但不连续", "既不连续也不可导"],
+          "answer": 1,
+          "explanation": "连续：|x·sin(1/x)| ≤ |x| → 0 = f(0)。不可导：按定义 f(x)/x = sin(1/x)，x→0 时极限不存在（振荡），故导数不存在。注意：有界×无穷小保证连续，但导数定义要求的比值极限是 sin(1/x) 本身，无极限。"
+        },
+        {
+          "type": "choice",
+          "question": "设 f'(x₀) 存在，则 lim(f(x₀+h) - f(x₀-h))/(2h)（h→0）= ？",
+          "options": ["f'(x₀)", "2f'(x₀)", "f'(x₀)/2", "无法确定"],
+          "answer": 0,
+          "explanation": "拆成两项：[f(x₀+h)-f(x₀)]/(2h) + [f(x₀)-f(x₀-h)]/(2h) → f'(x₀)/2 + f'(x₀)/2 = f'(x₀)。这是导数定义的对称形式，考研常考。"
+        },
+        {
+          "type": "choice",
+          "question": "y = ln(√((1+x)/(1-x)))，y' = ？",
+          "options": ["1/(1-x²)", "1/(2(1+x)) - 1/(2(1-x))", "1/(1+x) - 1/(1-x)", "1/√((1+x)/(1-x))"],
+          "answer": 0,
+          "explanation": "先拆对数：y = ½[ln(1+x) - ln(1-x)]，y' = ½[1/(1+x) + 1/(1-x)] = 1/(1-x²)。先化简再求导。"
+        },
+        {
+          "type": "choice",
+          "question": "参数方程 x = t², y = t³ 在 t=1 处的 d²y/dx² = ？",
+          "options": ["3/4", "3t（代 t=1 得 3）", "3/2", "6t（代 t=1 得 6）"],
+          "answer": 0,
+          "explanation": "dy/dx = 3t²/2t = 3t/2。d²y/dx² = d(3t/2)/dt ÷ dx/dt = (3/2)/(2t) = 3/(4t)，t=1 时为 3/4。不是 y''(t)/x''(t) = 6t/2 = 3t——那是经典错误。"
+        },
+        {
+          "type": "choice",
+          "question": "下列可导的是？",
+          "options": ["f(x) = |x| 在 x=0", "f(x) = √x 在 x=0", "f(x) = x² 在 x=0", "f(x) = x^(1/3) 在 x=0"],
+          "answer": 2,
+          "explanation": "x² 在 0 处导数 0。|x| 尖点不可导；√x 在 0 处切线竖直（导数为无穷）；x^(1/3) 在 0 处切线竖直（x^(1/3)' = (1/3)x^(-2/3) → ∞）。垂直切线处导数不存在。"
+        },
+        {
+          "type": "choice",
+          "question": "y = x³·eˣ，则 y'' = ？",
+          "options": ["(x³+6x²+6x)eˣ", "(x³+3x²)eˣ", "(6x²+6x)eˣ", "(x³+6x²)eˣ"],
+          "answer": 0,
+          "explanation": "莱布尼茨（或逐次求导）：y' = (3x²+x³)eˣ = (x³+3x²)eˣ；y'' = (3x²+6x)eˣ + (x³+3x²)eˣ = (x³+6x²+6x)eˣ。"
+        }
+      ]
+    }
+  ]
+}
