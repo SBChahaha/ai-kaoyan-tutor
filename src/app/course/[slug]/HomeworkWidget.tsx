@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import MathText from "../../components/MathText";
+import SymbolPalette from "../../components/SymbolPalette";
 
 export type HomeworkItem = {
   id: number;
@@ -89,12 +91,14 @@ export default function HomeworkWidget({
           return (
             <div key={qi} className="rounded-xl border border-blue-100 bg-white p-4">
               <div className="mb-2 flex items-start justify-between gap-3">
-                <p className="text-sm font-medium text-slate-800">
+                <div className="min-w-0 flex-1 text-sm font-medium text-slate-800">
                   <span className="mr-1.5 inline-flex h-5 w-5 items-center justify-center rounded-full bg-blue-600 text-xs text-white">
                     {qi}
                   </span>
-                  {q}
-                </p>
+                  <span className="inline-block align-middle">
+                    <MathText text={q} />
+                  </span>
+                </div>
                 {item?.score != null && (
                   <span
                     className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-bold ${
@@ -117,8 +121,8 @@ export default function HomeworkWidget({
                     {item.answer}
                   </div>
                   {item.feedback && (
-                    <div className="whitespace-pre-wrap rounded-lg bg-blue-50 p-3 text-sm text-slate-700">
-                      {item.feedback}
+                    <div className="rounded-lg bg-blue-50 p-3 text-sm text-slate-700">
+                      <MathText text={item.feedback} />
                     </div>
                   )}
                   <button
@@ -132,21 +136,33 @@ export default function HomeworkWidget({
                   </button>
                 </div>
               ) : (
-                <div className="flex gap-2">
-                  <textarea
-                    value={drafts[qi] ?? ""}
-                    onChange={(e) => setDrafts((d) => ({ ...d, [qi]: e.target.value }))}
-                    placeholder="写下你的作答（先自己认真做，再提交批改）"
-                    rows={2}
-                    className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400"
-                  />
-                  <button
-                    onClick={() => submit(qi)}
-                    disabled={busy[qi] || !(drafts[qi] ?? "").trim()}
-                    className="shrink-0 self-stretch rounded-lg bg-blue-600 px-4 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-40"
-                  >
-                    {busy[qi] ? "批改中…" : "提交"}
-                  </button>
+                <div>
+                  <div className="mb-1.5 flex items-center justify-between">
+                    <p className="text-xs text-slate-400">
+                      直接写就行，AI 看得懂：ln(x^2-3x+2)、sqrt(2)、x&gt;=1
+                    </p>
+                    <SymbolPalette
+                      onInsert={(s) =>
+                        setDrafts((d) => ({ ...d, [qi]: (drafts[qi] ?? "") + s }))
+                      }
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <textarea
+                      value={drafts[qi] ?? ""}
+                      onChange={(e) => setDrafts((d) => ({ ...d, [qi]: e.target.value }))}
+                      placeholder="写下你的作答（先自己认真做，再提交批改）"
+                      rows={2}
+                      className="flex-1 rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-blue-400"
+                    />
+                    <button
+                      onClick={() => submit(qi)}
+                      disabled={busy[qi] || !(drafts[qi] ?? "").trim()}
+                      className="shrink-0 self-stretch rounded-lg bg-blue-600 px-4 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-40"
+                    >
+                      {busy[qi] ? "批改中…" : "提交"}
+                    </button>
+                  </div>
                 </div>
               )}
             </div>

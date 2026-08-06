@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import MathText from "../../../components/MathText";
+import SymbolPalette from "../../../components/SymbolPalette";
 
 type Q = { type: "choice" | "fill"; question: string; options?: string[] };
 type Result = {
@@ -258,9 +260,9 @@ export default function QuizClient({
         <span className="rounded-full bg-blue-100 px-2.5 py-1 text-xs font-semibold text-blue-700">
           {isChoice ? "选择题" : "填空题"}
         </span>
-        <h2 className="mt-3 text-lg font-semibold leading-relaxed text-slate-800">
-          {q.question}
-        </h2>
+        <div className="mt-3 text-lg font-semibold leading-relaxed text-slate-800">
+          <MathText text={q.question} />
+        </div>
 
         {isChoice ? (
           <div className="mt-5 space-y-2.5">
@@ -308,12 +310,26 @@ export default function QuizClient({
             )}
           </div>
         ) : (
-          <input
-            value={(answers[current] as string) ?? ""}
-            onChange={(e) => setFill(e.target.value)}
-            placeholder="输入你的答案…"
-            className="mt-5 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-blue-400"
-          />
+          <div className="mt-5">
+            <div className="mb-1.5 flex items-center justify-between">
+              <p className="text-xs text-slate-400">
+                直接输入即可：x&lt;1或x&gt;2、sqrt(2)、3/2 都行
+              </p>
+              <SymbolPalette
+                onInsert={(s) => {
+                  const next = [...answers];
+                  next[current] = (answers[current] as string ?? "") + s;
+                  setAnswers(next);
+                }}
+              />
+            </div>
+            <input
+              value={(answers[current] as string) ?? ""}
+              onChange={(e) => setFill(e.target.value)}
+              placeholder="输入你的答案…"
+              className="w-full rounded-xl border border-slate-300 px-4 py-3 text-sm outline-none focus:border-blue-400"
+            />
+          </div>
         )}
 
         {needExplain && (
