@@ -1,0 +1,84 @@
+import Link from "next/link";
+import { db, todayStr } from "@/lib/db";
+import { EXAM_DATE } from "@/lib/config";
+import TodayPlans from "./components/TodayPlans";
+
+export const dynamic = "force-dynamic";
+
+export default function HomePage() {
+  const today = todayStr();
+  const daysLeft = Math.ceil(
+    (new Date(EXAM_DATE).getTime() - new Date(today).getTime()) / 86400000
+  );
+
+  const noteCount = (db.prepare("SELECT COUNT(*) AS c FROM notes").get() as { c: number }).c;
+  const mistakeCount = (
+    db.prepare("SELECT COUNT(*) AS c FROM mistakes").get() as { c: number }
+  ).c;
+  const pendingMistakes = (
+    db.prepare("SELECT COUNT(*) AS c FROM mistakes WHERE status = 'pending'").get() as {
+      c: number;
+    }
+  ).c;
+
+  // 最近 7 天学习时长
+  const weekAgo = new Date(Date.now() - 6 * 86400000);
+  const p = (n: number) => String(n).padStart(2, "0");
+  const weekAgoStr = `${weekAgo.getFullYear()}-${p(weekAgo.getMonth() + 1)}-${p(weekAgo.getDate())}`;
+  const weekHours = (
+    db
+      .prepare("SELECT COALESCE(SUM(hours), 0) AS s FROM logs WHERE date >= ?")
+      .get(weekAgoStr) as { s: number }
+  ).s;
+
+  return (
+    <div className="space-y-6">
+      {/* 倒计时横幅 */}
+      <div className="rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <div className="text-sm text-blue-100">距离 2027 考研初试（{EXAM_DATE}）还有</div>
+            <div className="mt-1 text-5xl font-bold">{daysLeft}</div>
+            <div className="mt-1 text-sm text-blue-100">天 — 今天也要加油 💪</div>
+          </div>
+          <div className="flex gap-3 text-sm">
+            <Link
+              href="/notes"
+              className="rounded-lg bg-white/15 px-4 py-2 hover:bg-white/25"
+            >
+              📚 去学习
+            </Link>
+            <Link href="/chat" className="rounded-lg bg-white/15 px-4 py-2 hover:bg-white/25">
+              🤖 AI 答疑
+            </Link>
+          </div>
+        </div>
+      </div>
+
+      {/* 统计卡片 */}
+      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+        <div className="rounded-xl border border-slate-200 bg-white p-4">
+          <div className="text-xs text-slate-500">知识库章节</div>
+          <div className="mt-1 text-2xl font-bold">{noteCount}</div>
+        </div>
+        <div className="rounded-xl border border-slate-200 bg-white p-4">
+          <div className="text-xs text-slate-500">错题总数</div>
+          <div className="mt-1 text-2xl font-bold">{mistakeCount}</div>
+        </div>
+        <div className="rounded-xl border border-slate-200 bg-white p-4">
+          <div className="text-xs text-slate-500">待复习错题</div>
+          <div className="mt-1 text-2xl font-bold text-orange-600">{pendingMistakes}</div>
+        </div>
+        <div className="rounded-xl border border-slate-200 bg-white p-4">
+          <div className="text-xs text-slate-500">近 7 天学习</div>
+          <div className="mt-1 text-2xl font-bold">{weekHours} h</div>
+        </div>
+      </div>
+
+      {/* 今日计划 */}
+      <div className="rounded-xl border border-slate-200 bg-white p-5">
+        <TodayPlans />
+      </div>
+    </div>
+  );
+}
