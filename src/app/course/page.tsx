@@ -2,7 +2,8 @@ import Link from "next/link";
 import { listLessons, groupByChapter, type LessonMeta } from "@/lib/course";
 import { SUBJECT_COLORS } from "@/lib/config";
 import { db } from "@/lib/db";
-import CourseIndexClient from "./CourseIndexClient";
+import { getLevelStates, hasQuiz } from "@/lib/quiz";
+import CourseIndexClient, { type LevelInfo } from "./CourseIndexClient";
 
 export const dynamic = "force-dynamic";
 
@@ -17,15 +18,23 @@ export default function CoursePage() {
     subjects.set(g.subject, s);
   }
 
-  // 服务器端读取进度（AI 可查）
-  const progRows = db.prepare("SELECT lesson_slug, done FROM progress").all() as unknown as {
-    lesson_slug: string;
-    done: number;
-  }[];
-  const initialProgress: Record<string, boolean> = {};
-  for (const p of progRows) initialProgress[p.lesson_slug] = !!p.done;
+  // 闯关状态（服务器端，AI 可查）
+  const levelStates = getLevelStates(
+    lessons.map((l) => ({ slug: l.slug, title: l.title, subject: l.subject }))
+  );
+  const levels: Record<string, LevelInfo> = {};
+  for (const st of levelStates) {
+    levels[st.slug] = {
+      hasQuiz: st.hasQuiz,
+      unlocked: st.unlocked,
+      passed: st.passed,
+      stars: st.stars,
+      attempts: st.attempts,
+    };
+  }
 
   const total = lessons.length;
+  const quizCount = lessons.filter((l) => hasQuiz(l.slug)).length;
 
   return (
     <div className="space-y-8">
@@ -59,7 +68,7 @@ export default function CoursePage() {
             })),
           })),
         }))}
-        initialProgress={initialProgress}
+        levels={levels}
       />
     </div>
   );

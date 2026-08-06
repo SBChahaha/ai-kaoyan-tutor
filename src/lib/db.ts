@@ -62,6 +62,17 @@ if (!g.__db) {
       created_at TEXT NOT NULL,
       updated_at TEXT NOT NULL
     );
+    CREATE TABLE IF NOT EXISTS quiz_attempts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      lesson_slug TEXT NOT NULL,
+      score INTEGER NOT NULL,
+      total INTEGER NOT NULL,
+      percent INTEGER NOT NULL,
+      stars INTEGER NOT NULL,
+      passed INTEGER NOT NULL DEFAULT 0,
+      answers TEXT NOT NULL DEFAULT '{}',
+      created_at TEXT NOT NULL
+    );
     CREATE INDEX IF NOT EXISTS idx_notes_subject ON notes(subject);
     CREATE INDEX IF NOT EXISTS idx_mistakes_subject ON mistakes(subject);
     CREATE INDEX IF NOT EXISTS idx_logs_date ON logs(date);

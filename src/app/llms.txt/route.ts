@@ -29,10 +29,11 @@ export async function GET() {
   lines.push("");
   lines.push("## 机器可读 API（学习状态检查）");
   lines.push("");
-  lines.push("- GET /api/status — 学习状态摘要（课程进度、作业数、待复习错题）");
+  lines.push("- GET /api/status — 学习状态摘要（课程进度、闯关、作业数、待复习错题）");
   lines.push("- GET /api/course — 课程清单（slug/title/科目/章节）");
   lines.push("- GET /api/progress — 课程完成进度（lesson_slug → done）");
   lines.push("- GET /api/homework — 作业提交与 AI 批改记录");
+  lines.push("- GET /api/quiz/[slug] — 关卡题目与闯关记录；POST 提交作答（服务端判分）");
   lines.push("- GET /api/notes — 笔记；GET /api/mistakes — 错题；GET /api/logs — 学习日志");
   lines.push("");
   lines.push("## 内容存放");

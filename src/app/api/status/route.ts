@@ -24,6 +24,14 @@ export async function GET() {
     c: number;
   };
   const homework = db.prepare("SELECT COUNT(*) AS c FROM homework").get() as { c: number };
+  const quiz = db
+    .prepare(
+      "SELECT COUNT(DISTINCT lesson_slug) AS c FROM quiz_attempts WHERE passed = 1"
+    )
+    .get() as { c: number };
+  const quizAttempts = db.prepare("SELECT COUNT(*) AS c FROM quiz_attempts").get() as {
+    c: number;
+  };
 
   return NextResponse.json({
     app: "ai-kaoyan-tutor",
@@ -35,12 +43,17 @@ export async function GET() {
       percent: lessons.length ? Math.round((doneCount / lessons.length) * 100) : 0,
       by_subject: bySubject,
     },
+    levels: {
+      passed_levels: quiz.c,
+      total_attempts: quizAttempts.c,
+    },
     homework: { submitted: homework.c },
     mistakes: { pending: mistakes.c },
     api: {
       lessons: "/api/course",
       progress: "/api/progress",
       homework: "/api/homework",
+      quiz: "/api/quiz/[slug]",
       status: "/api/status",
     },
   });
